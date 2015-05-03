@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-import material_resources as m_res
 from kivy.properties import StringProperty, ListProperty
 from kivy.uix.boxlayout import BoxLayout as _BoxLayout
 from kivy.metrics import dp
+
+from kivymd import material_resources as m_res
 from layouts import MaterialRelativeLayout
 from label import MaterialLabel
 from button import MaterialIcon

@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-from layouts import MaterialFloatLayout, MaterialBoxLayout
-from label import MaterialLabel
-from ripplebehavior import RippleBehavior
 from kivy.properties import StringProperty, NumericProperty
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.metrics import dp
+
+from layouts import MaterialFloatLayout, MaterialBoxLayout
+from kivymd.label import MaterialLabel
+from ripplebehavior import RippleBehavior
 
 
 class MaterialIcon(RippleBehavior, ButtonBehavior, MaterialBoxLayout):

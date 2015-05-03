@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
-import helpers
-from layouts import MaterialRelativeLayout
-from shadow import Shadow
+from threading import Timer as ThreadedTimer
+
 from kivy.properties import StringProperty, BooleanProperty, NumericProperty
 from kivy.animation import Animation
 from kivy.metrics import dp
-from threading import Timer as ThreadedTimer
+
+from kivymd import helpers
+from layouts import MaterialRelativeLayout
+from kivymd.shadow import Shadow
 
 
 class SlidingPanel(MaterialRelativeLayout):

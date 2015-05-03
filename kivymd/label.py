@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-import material_resources as m_res
 from kivy.uix.label import Label
 from kivy.properties import StringProperty
 from kivy.metrics import sp
+
+from kivymd import material_resources as m_res
 from layouts import BackgroundColorCapableWidget
 
 

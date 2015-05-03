@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from kivy.metrics import dp
-from layouts import MaterialRelativeLayout
+
+from kivymd.layouts import MaterialRelativeLayout
 
 
 class Divider(MaterialRelativeLayout):

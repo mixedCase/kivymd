@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
-import material_resources as m_res
 from kivy.properties import ListProperty, NumericProperty, StringProperty
 from kivy.animation import Animation
 from kivy.graphics import Color, Ellipse, StencilPush, StencilPop, StencilUse,\
 	StencilUnUse, Rectangle
+
+from kivymd import material_resources as m_res
+
 
 # Special thanks to github.com/Kovak/ for his work on FlatKivy, which provided
 # the basis for this class.

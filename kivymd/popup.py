@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from kivy.properties import StringProperty, ObjectProperty
 from kivy.uix.modalview import ModalView
+from twisted.internet import defer
+
 from layouts import MaterialBoxLayout as BoxLayout
 from layouts import MaterialAnchorLayout as AnchorLayout
-from label import MaterialLabel as Label
-from twisted.internet import defer
+from kivymd.label import MaterialLabel as Label
+
 
 class DeferredModalView(ModalView):
 

@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
 import kivy
-import material_resources as m_res
 
 kivy.require('1.9.0')
 
 from kivy.app import App
 from kivy.metrics import dp
-from layouts import MaterialRelativeLayout
-from toolbar import Toolbar
-from navigationdrawer import NavigationDrawer, NavigationDrawerButton, \
+from kivymd.layouts import MaterialRelativeLayout
+from kivymd.toolbar import Toolbar
+from kivymd.navigationdrawer import NavigationDrawer, NavigationDrawerButton, \
 	NavigationDrawerCategory
 
 
 class MainWidget(MaterialRelativeLayout):
 
 	def __init__(self, **kwargs):
-		self.toolbar = Toolbar(title="KivyMD Kitchen Sink App")
+		self.toolbar = Toolbar(title="KivyMD Kitchen Sink App")
 		self.nav = NavigationDrawer(
 			side="left",
 			header_img="images/PLACEHOLDER_BG.jpg",

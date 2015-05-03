@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-import material_resources as m_res
-from layouts import MaterialGridLayout, MaterialRelativeLayout, \
-	MaterialBoxLayout
-from label import MaterialLabel
-from divider import Divider
 from kivy.properties import StringProperty, NumericProperty, BooleanProperty
 from kivy.metrics import dp, sp
 from kivy.uix.image import Image
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.behaviors import ButtonBehavior
+
+from kivymd import material_resources as m_res
+from layouts import MaterialGridLayout, MaterialRelativeLayout, \
+	MaterialBoxLayout
+from label import MaterialLabel
+from divider import Divider
 
 
 class List(MaterialRelativeLayout):

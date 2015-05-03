@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
-from layouts import MaterialFloatLayout
-from kivy.uix.behaviors import ButtonBehavior
-from kivy.properties import BoundedNumericProperty, BooleanProperty
 from time import sleep
 from threading import Thread
+
+from kivy.uix.behaviors import ButtonBehavior
+from kivy.properties import BoundedNumericProperty, BooleanProperty
+
+from kivymd.layouts import MaterialFloatLayout
 
 
 class Shadow(ButtonBehavior, MaterialFloatLayout):

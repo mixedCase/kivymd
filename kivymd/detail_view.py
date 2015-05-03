@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-from layouts import MaterialBoxLayout
-from label import MaterialLabel
-from list import List
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.image import Image
 from kivy.uix.modalview import ModalView
+
+from layouts import MaterialBoxLayout
+from kivymd.label import MaterialLabel
+from list import List
 
 
 class DetailView(ModalView):

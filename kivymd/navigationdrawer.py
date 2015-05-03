@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
-import material_resources as m_res
-from divider import Divider
-from slidingpanel import SlidingPanel
-from layouts import MaterialRelativeLayout, MaterialGridLayout
-from label import MaterialLabel
-from button import MaterialButtonBlank
 from kivy.uix.image import Image as Image
 from kivy.properties import StringProperty, BooleanProperty
 from kivy.metrics import dp
 from kivy.core.window import Window
 from kivy.uix.scrollview import ScrollView
+
+from kivymd import material_resources as m_res
+from divider import Divider
+from slidingpanel import SlidingPanel
+from layouts import MaterialRelativeLayout, MaterialGridLayout
+from label import MaterialLabel
+from button import MaterialButtonBlank
 
 
 class NavigationDrawer(SlidingPanel):
