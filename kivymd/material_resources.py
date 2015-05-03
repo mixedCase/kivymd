@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import kivymd
 from kivy.metrics import dp
 from kivy.core.window import Window
 from kivy import platform
@@ -27,11 +28,11 @@ else:
 	LANDSCAPE_TOOLBAR_HEIGHT = STANDARD_INCREMENT
 
 TOUCH_TARGET_HEIGHT = dp(48)
-FONT_REGULAR = "fonts/Roboto-Regular.ttf"
-FONT_MEDIUM = "fonts/Roboto-Medium.ttf"
-FONT_BOLD = "fonts/Roboto-Bold.ttf"
-FONT_ICONS = "fonts/Material-Design-Iconic-Font.ttf"
-ICON_DEFAULT = "images/ic_lens_grey_48dp.png"
+FONT_REGULAR = kivymd.fonts_path + "Roboto-Regular.ttf"
+FONT_MEDIUM = kivymd.fonts_path + "Roboto-Medium.ttf"
+FONT_BOLD = kivymd.fonts_path + "Roboto-Bold.ttf"
+FONT_ICONS = kivymd.fonts_path + "Material-Design-Iconic-Font.ttf"
+ICON_DEFAULT = kivymd.images_path + "ic_lens_grey_48dp.png"
 
 # While theming is not implemented, use light background settings
 TEXT_COLOR = (0,0,0,1)
@@ -84,6 +85,13 @@ PALETTE_GREY = {
 	"700": [97/255., 97/255., 97/255.],
 	"800": [66/255., 66/255., 66/255.],
 	"900": [33/255., 33/255., 33/255.],
+}
+
+# Gallery available here:
+# https://zavoloklom.github.io/material-design-iconic-font/icons.html
+ICONS = {
+	"md-menu": "",
+    "md-refresh": ""
 }
 
 def get_palette_with_alpha(palette, alpha_level=1.):

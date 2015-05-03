@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import kivy
+import kivymd
 
 kivy.require('1.9.0')
 
@@ -17,7 +18,7 @@ class MainWidget(MaterialRelativeLayout):
 		self.toolbar = Toolbar(title="KivyMD Kitchen Sink App")
 		self.nav = NavigationDrawer(
 			side="left",
-			header_img="images/PLACEHOLDER_BG.jpg",
+			header_img=kivymd.images_path + "PLACEHOLDER_BG.jpg",
 			width=dp(400))
 		super(MainWidget, self).__init__(**kwargs)
 
