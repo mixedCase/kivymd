@@ -10,10 +10,13 @@ from kivymd.layouts import MaterialRelativeLayout
 from kivymd.toolbar import Toolbar
 from kivymd.navigationdrawer import NavigationDrawer, NavigationDrawerButton, \
 	NavigationDrawerCategory
+from kivymd.theme import ThemeManager
 
 
 class MainWidget(MaterialRelativeLayout):
 	def __init__(self, **kwargs):
+		self.theme_manager = ThemeManager()
+
 		self.toolbar = Toolbar(title="KivyMD Kitchen Sink App")
 		self.nav = NavigationDrawer(
 			side="left",

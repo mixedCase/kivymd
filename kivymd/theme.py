@@ -512,36 +512,24 @@ class ThemeManager(Widget):
 	def _get_error_color(self):
 		return get_rgba_color([self._error_color, self._error_weight])
 
-	def _set_error_color(self, tuple):
+	def _set_error_color(self, color_tuple):
 		try:
-			color, weight = tuple
+			color, weight = color_tuple
 			self._error_color = color
 			self._error_weight = weight
+		except ValueError as e:
+			print e.message
 
-	error_color = AliasProperty(_get_error_color, _set_error_color, None)
+	error_color = AliasProperty(_get_error_color, _set_error_color, bind=('_error_color', '_error_weight', ))
 	""":attr:`error_color` holds the color used for error text messages.
 
+	To change the :attr:`error_color` use::
 
-	The :attr:`divider_color` is a
-	:class:`kivy.properties.AliasProperty` and defaults to 12% black in rgb.
+		theme_manager.error_color = ['Red', '900']
+
+	The :attr:`error_color` is a
+	:class:`kivy.properties.AliasProperty` and defaults to ``Red A700`` in rgb.
 	"""
 
 	def __init__(self, **kwargs):
 		super(ThemeManager, self).__init__(**kwargs)
-
-		#
-		# theme_colors = {'ERROR':            get_rgba_color(['Red', 'A700']),
-		# 'WHITE':            get_rgba_color(['Light', 'White']),
-		# 'PRIMARY':          get_rgba_color(['LightGreen', '500']),
-		#                 'PRIMARY_DARK':     get_rgba_color(['LightGreen', '700']),
-		#                 'PRIMARY_LIGHT':    get_rgba_color(['LightGreen', '100']),
-		#                 'ACCENT_1':         get_rgba_color(['Red', '500']),
-		#                 'ACCENT_2':         get_rgba_color(['Yellow', 'A100']),
-		#                 'PRIMARY_TEXT':     get_rgba_color(['Dark', 'Black'], control_alpha=.87),
-		#                 'SECONDARY_TEXT':   get_rgba_color(['Dark', 'Black'], control_alpha=.54),
-		#                 'HINTS':            get_rgba_color(['Dark', 'Black'], control_alpha=.26),
-		#                 'ICONS':            get_rgba_color(['Light', 'White']),
-		#                 'COLOR_DOWN':       get_color_from_hex('99999966'),
-		#                 'DIVIDER':          get_rgba_color(['Dark', 'Black'], control_alpha=.12),
-		#                 'TRANSPARENT':      (1., 1., 1., 0)
-		#                 }

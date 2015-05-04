@@ -114,7 +114,7 @@
 </ul>
 <dl class="class">
 <dt id="kivymd.theme.ThemeManager">
-<em class="property">class </em><tt class="descclassname">kivymd.theme.</tt><tt class="descname">ThemeManager</tt><a class="headerlink" href="#kivymd.theme.ThemeManager" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">kivymd.theme.</tt><tt class="descname">ThemeManager</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#kivymd.theme.ThemeManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>The <tt class="xref py py-class docutils literal"><span class="pre">ThemeManager()</span></tt> manage the overall appearance by implementing the Material
 Design style guidelines for colors and fonts.</p>
 <div class="admonition note">
@@ -295,7 +295,7 @@ by <tt class="xref py py-class docutils literal"><span class="pre">MaterialDialo
 <li><tt class="xref py py-class docutils literal"><span class="pre">ThemeManager.theme_style('Light')</span></tt> sets the <tt class="xref py py-attr docutils literal"><span class="pre">dialog_background_color</span></tt> to <tt class="docutils literal"><span class="pre">Grey</span> <span class="pre">50</span></tt> (in rgb)</li>
 <li><tt class="xref py py-class docutils literal"><span class="pre">ThemeManager.theme_style('Dark')</span></tt> sets the <tt class="xref py py-attr docutils literal"><span class="pre">dialog_background_color</span></tt> to <tt class="docutils literal"><span class="pre">Grey</span> <span class="pre">800</span></tt> (in rgb)</li>
 </ul>
-<p>The <tt class="xref py py-data docutils literal"><span class="pre">main_background_color</span></tt> is a
+<p>The <tt class="xref py py-attr docutils literal"><span class="pre">main_background_color</span></tt> is a
 <tt class="xref py py-class docutils literal"><span class="pre">kivy.properties.AliasProperty</span></tt> and defaults to <tt class="docutils literal"><span class="pre">Grey</span> <span class="pre">200</span></tt> in rgb.</p>
 </dd></dl>
 
@@ -600,6 +600,18 @@ customized by setting a different hue for the individual attributes.</p>
 <li><tt class="xref py py-class docutils literal"><span class="pre">ThemeManager.theme_style('Light')</span></tt> sets the <tt class="xref py py-attr docutils literal"><span class="pre">divider_color</span></tt> to 12% black (in rgb)</li>
 <li><tt class="xref py py-class docutils literal"><span class="pre">ThemeManager.theme_style('Dark')</span></tt> sets the <tt class="xref py py-attr docutils literal"><span class="pre">divider_color</span></tt> to 12% white (in rgb)</li>
 </ul>
+<p>The <tt class="xref py py-attr docutils literal"><span class="pre">divider_color</span></tt> is a
+<tt class="xref py py-class docutils literal"><span class="pre">kivy.properties.AliasProperty</span></tt> and defaults to 12% black in rgb.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="kivymd.theme.ThemeManager.error_color">
+<tt class="descname">error_color</tt><a class="headerlink" href="#kivymd.theme.ThemeManager.error_color" title="Permalink to this definition">¶</a></dt>
+<dd><p><tt class="xref py py-attr docutils literal"><span class="pre">error_color</span></tt> holds the color used for error text messages.</p>
+<p>To change the <tt class="xref py py-attr docutils literal"><span class="pre">error_color</span></tt> use:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">theme_manager</span><span class="o">.</span><span class="n">error_color</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Red&#39;</span><span class="p">,</span> <span class="s">&#39;900&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
 <p>The <tt class="xref py py-attr docutils literal"><span class="pre">divider_color</span></tt> is a
 <tt class="xref py py-class docutils literal"><span class="pre">kivy.properties.AliasProperty</span></tt> and defaults to 12% black in rgb.</p>
 </dd></dl>
