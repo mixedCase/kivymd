@@ -3,6 +3,7 @@ import kivymd
 from kivy.metrics import dp
 from kivy.core.window import Window
 from kivy import platform
+from kivy.utils import get_color_from_hex
 from copy import deepcopy
 from kivymd.md_icon_definitions import md_icons
 from kivymd.color_definitions import colors
