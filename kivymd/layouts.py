@@ -10,47 +10,47 @@ from kivy.graphics import Color, Rectangle
 
 
 class BackgroundColorCapableWidget(Widget):
-    r = NumericProperty(1)
-    g = NumericProperty(1)
-    b = NumericProperty(1)
-    a = NumericProperty(0)
-    background_color = ReferenceListProperty(r, g, b, a)
+	r = NumericProperty(1)
+	g = NumericProperty(1)
+	b = NumericProperty(1)
+	a = NumericProperty(0)
+	background_color = ReferenceListProperty(r, g, b, a)
 
-    def __init__(self, **kwargs):
-        super(BackgroundColorCapableWidget, self).__init__(**kwargs)
-        with self.canvas:
-            self._bg_color = Color(rgba=(self.r, self.g, self.b, self.a))
-            self._bg_rect = Rectangle(pos=(0, 0))
-            self.bind(size=self._update_bg_rectangle_size)
-            self.bind(pos=self._update_bg_rectangle_pos)
+	def __init__(self, **kwargs):
+		super(BackgroundColorCapableWidget, self).__init__(**kwargs)
+		with self.canvas:
+			self._bg_color = Color(rgba=(self.r, self.g, self.b, self.a))
+			self._bg_rect = Rectangle(pos=(0, 0))
+			self.bind(size=self._update_bg_rectangle_size)
+			self.bind(pos=self._update_bg_rectangle_pos)
 
-    def _update_bg_rectangle_size(self, instance, size):
-        self._bg_rect.size = size
+	def _update_bg_rectangle_size(self, instance, size):
+		self._bg_rect.size = size
 
-    def _update_bg_rectangle_pos(self, instance, pos):
-        self._bg_rect.pos = pos
+	def _update_bg_rectangle_pos(self, instance, pos):
+		self._bg_rect.pos = pos
 
-    def on_background_color(self, instance, color):
-        self._bg_color.rgba = color
+	def on_background_color(self, instance, color):
+		self._bg_color.rgba = color
 
 
 class MaterialGridLayout(GridLayout, BackgroundColorCapableWidget):
-    pass
+	pass
 
 
 class MaterialBoxLayout(BoxLayout, BackgroundColorCapableWidget):
-    pass
+	pass
 
 
 class MaterialAnchorLayout(AnchorLayout, BackgroundColorCapableWidget):
-    pass
+	pass
 
 
 class MaterialFloatLayout(FloatLayout, BackgroundColorCapableWidget):
-    pass
+	pass
 
 
 class MaterialRelativeLayout(RelativeLayout, BackgroundColorCapableWidget):
-    def __init__(self, **kwargs):
-        super(MaterialRelativeLayout, self).__init__(**kwargs)
-        self.unbind(pos=self._update_bg_rectangle_pos)
+	def __init__(self, **kwargs):
+		super(MaterialRelativeLayout, self).__init__(**kwargs)
+		self.unbind(pos=self._update_bg_rectangle_pos)

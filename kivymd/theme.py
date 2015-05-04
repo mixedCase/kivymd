@@ -532,7 +532,7 @@ class ThemeManager(Widget):
 		#
 		# theme_colors = {'ERROR':            get_rgba_color(['Red', 'A700']),
 		# 'WHITE':            get_rgba_color(['Light', 'White']),
-		#                 'PRIMARY':          get_rgba_color(['LightGreen', '500']),
+		# 'PRIMARY':          get_rgba_color(['LightGreen', '500']),
 		#                 'PRIMARY_DARK':     get_rgba_color(['LightGreen', '700']),
 		#                 'PRIMARY_LIGHT':    get_rgba_color(['LightGreen', '100']),
 		#                 'ACCENT_1':         get_rgba_color(['Red', '500']),
