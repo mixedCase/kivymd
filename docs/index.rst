@@ -21,4 +21,4 @@ Indices and tables
 * :ref:`search`
 
 .. autoclass:: kivymd.theme.ThemeManager
-    :members:
+	:members:
