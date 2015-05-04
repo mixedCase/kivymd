@@ -16,14 +16,12 @@ class List(MaterialRelativeLayout):
 
 	def __init__(self, **kwargs):
 		super(List, self).__init__(**kwargs)
-		self.sv = ScrollView(do_scroll_x=False)
 		self.gl = MaterialGridLayout(cols=1,
 		                             padding=(0, m_res.LIST_VERTICAL_PADDING,
 		                                      0, m_res.LIST_VERTICAL_PADDING),
 		                             height=2 * m_res.LIST_VERTICAL_PADDING,
 		                             size_hint_y=None)
-		self.sv.add_widget(self.gl)
-		self.add_widget(self.sv)
+		self.add_widget(self.gl)
 
 	def add_widget(self, widget, index=0):
 		if isinstance(widget, _ListItem):
@@ -97,12 +95,12 @@ class _ListItemWithImage(_ListItem):
 
 
 class SingleLineItem(_ListItem):
+	height = dp(48)
 	text_top_padding = dp(16)
 	text_bottom_padding = dp(20)
 
 	def __init__(self, **kwargs):
 		super(SingleLineItem, self).__init__(**kwargs)
-		self.height = dp(48)
 
 
 class SingleLineItemWithIcon(SingleLineItem, _ListItemWithImage):
