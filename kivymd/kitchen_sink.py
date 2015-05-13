@@ -6,7 +6,7 @@ kivy.require('1.9.0')
 
 from kivy.app import App
 from kivy.metrics import dp
-from kivymd.bottom_sheet import BottomSheet, SlidingModal
+from kivymd.bottom_sheet import BottomSheet
 from kivymd.layouts import MaterialRelativeLayout
 from kivymd.toolbar import Toolbar
 from kivymd.navigationdrawer import NavigationDrawer, NavigationDrawerButton, \
@@ -29,7 +29,9 @@ class MainWidget(MaterialRelativeLayout):
 		self.toolbar.add_action_button("")
 		self.toolbar.add_action_button("")
 		self.toolbar.add_action_button("")
-		self.toolbar.add_action_button("")
+		self.toolbar.add_action_button(
+			"",
+			action=lambda x: self.open_bottom_sheet())
 
 		self.cat1 = NavigationDrawerCategory(subheader=False)
 		self.cat_vendedores = NavigationDrawerCategory(text="Category 1")
@@ -46,6 +48,9 @@ class MainWidget(MaterialRelativeLayout):
 
 		self.add_widget(self.toolbar)
 		self.add_widget(self.nav)
+
+	def open_bottom_sheet(self):
+		BottomSheet().open()
 
 	def on_width(self, instance, value):
 		self.toolbar.width = value

@@ -76,13 +76,51 @@ class SlidingModal(MaterialBoxLayout):
 			return True
 
 	def on_touch_down(self, touch):
-		super(SlidingModal, self).on_touch_down(touch)
+		if not self.collide_point(*touch.pos):
+			return True
+		return super(SlidingModal, self).on_touch_down(touch)
+
+	def on_touch_move(self, touch):
+		if not self.collide_point(*touch.pos):
+			return True
+		return super(SlidingModal, self).on_touch_move(touch)
+
+	def on_touch_up(self, touch):
+		if not self.collide_point(*touch.pos):
+			return True
+		return super(SlidingModal, self).on_touch_up(touch)
+
+
+class ExpandableSlidingModal(SlidingModal):
+	_touch_pos = None
+	min_height = NumericProperty()
+	max_height = NumericProperty()
+
+	def on_touch_down(self, touch):
+		self._touch_pos = touch.pos
+		return super(ExpandableSlidingModal, self).on_touch_down(touch)
+
+	def on_touch_move(self, touch):
+		if self.side == "bottom":
+			new_height = self.height + (touch.pos[1] - self._touch_pos[1])
+			self._touch_pos = touch.pos
+			if self.resizing_condition(new_height):
+				pass
+			else:
+				return
+			if new_height < self.min_height:
+				new_height = self.min_height
+			elif new_height > self.max_height:
+				new_height = Window.height
+			self.height = new_height
+		else:
+			raise NotImplementedError("Only \"bottom\" implemented right now "
+			                          "for ExpandableSlidingModal, sorry")
+		return super(ExpandableSlidingModal, self).on_touch_move(touch)
+
+	def resizing_condition(self, new_height):
 		return True
 
 	def on_touch_up(self, touch):
-		super(SlidingModal, self).on_touch_up(touch)
-		return True
-
-	def on_touch_move(self, touch):
-		super(SlidingModal, self).on_touch_move(touch)
-		return True
+		self._touch_pos = None
+		return super(SlidingModal, self).on_touch_move(touch)

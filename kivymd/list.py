@@ -2,14 +2,13 @@
 from kivy.properties import StringProperty, NumericProperty, BooleanProperty
 from kivy.metrics import dp, sp
 from kivy.uix.image import Image
-from kivy.uix.scrollview import ScrollView
 from kivy.uix.behaviors import ButtonBehavior
 
 from kivymd import material_resources as m_res
-from layouts import MaterialGridLayout, MaterialRelativeLayout, \
-	MaterialBoxLayout
-from label import MaterialLabel
-from divider import Divider
+from kivymd.divider import Divider
+from kivymd.layouts import MaterialGridLayout, MaterialRelativeLayout, \
+	MaterialBoxLayout, RippleLayout
+from kivymd.label import MaterialLabel
 
 
 class List(MaterialGridLayout):
@@ -56,6 +55,7 @@ class _ListItem(ButtonBehavior, MaterialRelativeLayout):
 		self.add_widget(self.bl_text)
 
 		self.add_widget(self._divider)
+		self.add_widget(RippleLayout())
 
 	def on_width(self, instance, value):
 		self.bl_text.width = self.width - self.bl_text.x
@@ -97,6 +97,12 @@ class SingleLineItem(_ListItem):
 	def __init__(self, **kwargs):
 		super(SingleLineItem, self).__init__(**kwargs)
 		self.height = dp(48)
+
+
+class SubheaderLineItem(SingleLineItem):
+	def __init__(self, **kwargs):
+		super(SubheaderLineItem, self).__init__(**kwargs)
+		self.lbl_primary.color = (0, 0, 0, 0.54)
 
 
 class SingleLineItemWithIcon(SingleLineItem, _ListItemWithImage):

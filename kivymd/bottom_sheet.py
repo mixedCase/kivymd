@@ -3,29 +3,35 @@ from kivy.core.window import Window
 from kivy.metrics import dp
 from kivy.properties import StringProperty
 from kivy.uix.scrollview import ScrollView
-from kivymd.layouts import MaterialBoxLayout
-from kivymd.list import List, SingleLineItem
+from kivymd.list import List, SubheaderLineItem, SingleLineItem
+from kivymd.slidingmodal import ExpandableSlidingModal
 
 
-class BottomSheet(MaterialBoxLayout):
+class BottomSheet(ExpandableSlidingModal):
 
-	header = StringProperty("")
+	header = StringProperty("Lel")
 
 	def __init__(self, **kwargs):
-		self.layout = MaterialBoxLayout(orientation="vertical")
-		self.layout.background_color = (1,0,0,1)
-		self.subheader = SingleLineItem(text=self.header,
-		                                size_hint_y=None)
-		self.sv = ScrollView(do_scroll_x=False)
+		self.orientation = "vertical"
+		self.side = "bottom"
+		self.background_color = (1,1,1,1)
+		self.subheader = SubheaderLineItem(text=self.header,
+		                                   size_hint_y=None,
+		                                   divider=False)
+		self.sv = ScrollView(do_scroll_x=False,
+		                     effect_cls="ScrollEffect")
 		self.list = List()
+		self.size_hint_y = None
 		super(BottomSheet, self).__init__(**kwargs)
-		self.width = Window.width
+		self.on_header(None, self.header)
+		self.max_height = Window.height
 		Window.bind(on_width=self.setter("width"))
 		self.sv.add_widget(self.list)
-		self.layout.add_widget(self.subheader)
-		self.layout.add_widget(self.sv)
+		self.add_widget(self.subheader)
+		self.add_widget(self.sv)
 
-		self.add_widget(self.layout)
+		for i in range(0, 30):
+			self.add_item(SingleLineItem(text="Test", divider=False))
 
 	def on_header(self, instance, value):
 		self.subheader.text = value
@@ -34,8 +40,26 @@ class BottomSheet(MaterialBoxLayout):
 		else:
 			self.subheader.height = dp(56)
 
-	#def add_widget(self, widget, index=0):
-	#	self.list.add_widget(widget, index)
-#
-#	def remove_widget(self, widget):
-#		self.list.remove_widget(widget)
+	def open(self):
+		self.height = min(self.subheader.height + self.list.height,
+		                  4*dp(48) + dp(8))
+		self.min_height = self.height
+		super(BottomSheet, self).open()
+
+	def resizing_condition(self, new_height):
+		if new_height < self.height and self.height == self.max_height and \
+						self.sv.scroll_y != 1.:
+			return False
+		elif self.height < self.max_height:
+			self.sv.do_scroll_y = False
+			return True
+		else:
+			self.sv.do_scroll_y = True
+			return True
+
+	def add_item(self, widget):
+		widget.bind(on_release=lambda x: self.dismiss())
+		self.list.add_widget(widget)
+
+	def remove_item(self, widget):
+		self.list.remove_widget(widget)
