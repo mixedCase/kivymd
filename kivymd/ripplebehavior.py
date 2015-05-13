@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from functools import partial
-from kivy.properties import ListProperty, NumericProperty, StringProperty
+from kivy.properties import ListProperty, NumericProperty, StringProperty, ObjectProperty
 from kivy.animation import Animation
 from kivy.graphics import Color, Ellipse, StencilPush, StencilPop, StencilUse, \
 	StencilUnUse, Rectangle
@@ -12,6 +12,10 @@ from kivymd import material_resources as m_res
 
 # Special thanks to github.com/Kovak/ for his work on FlatKivy, which provided
 # the basis for this class.
+def dist(p1, p2):
+    (x1, y1) = p1
+    (x2, y2) = p2
+    return ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 5
 
 class RippleBehavior(object):
 	ripple_rad = NumericProperty(10)
@@ -61,11 +65,11 @@ class RippleBehavior(object):
 	def start_rippeling(self, *args):
 		rc = self.ripple_color
 		duration = self.ripple_duration_in_slow if self.state == 'down' else self.ripple_duration_in_fast
-		anim = Animation(ripple_rad=max(self.width, self.height) * self.ripple_scale,
+		self.anim = Animation(ripple_rad=max(self.width, self.height) * self.ripple_scale,
 						 t=self.ripple_func_in,
 						 ripple_color=[rc[0], rc[1], rc[2], self.ripple_fade_to_alpha],
 						 duration=duration)
-		anim.start(self)
+		self.anim.start(self)
 
 	def set_ellipse(self, instance, value):
 		ellipse = self.ellipse
@@ -77,6 +81,16 @@ class RippleBehavior(object):
 
 	def set_color(self, instance, value):
 		self.col_instruction.rgba = value
+
+	def on_touch_move(self, touch, *args):
+		if (
+			touch.ud['ripple_timeout'] and
+				dist(touch.pos, touch.opos) > self.ripple_cancel_distance
+		):
+			Clock.unschedule(touch.ud['ripple_timeout'])
+			self.on_touch_up(touch)
+
+		return super(RippleBehavior, self).on_touch_move(touch, *args)
 
 	def on_touch_up(self, touch):
 		rc = self.ripple_color
