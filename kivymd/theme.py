@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 __version__ = "0.0.1"
 
+import re
 from kivy.app import App
 from kivy.core.text import LabelBase
 from kivy.uix.widget import Widget
@@ -542,6 +543,12 @@ class ThemeManager(Widget):
 	The :attr:`error_color` is a
 	:class:`kivy.properties.AliasProperty` and defaults to ``Red A700`` in rgb.
 	"""
+
+	def _get_btn_down_color(self):
+		hue = int(re.search(r'\d+', self.primary_hue).group())
+		return get_rgba_color([self.primary_palette, str(hue + 200)])
+
+	btn_down_color = AliasProperty(_get_btn_down_color, bind=('primary_palette', 'primary_hue', ))
 
 	def __init__(self, **kwargs):
 		super(ThemeManager, self).__init__(**kwargs)

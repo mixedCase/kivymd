@@ -7,6 +7,7 @@ from layouts import MaterialFloatLayout, MaterialBoxLayout
 from kivymd.label import MaterialLabel
 from ripplebehavior import RippleBehavior
 from elevationbehaviour import ElevationBehaviour
+from kivy.animation import Animation
 from kivy.graphics import Color, Rectangle
 from kivy.clock import Clock
 
@@ -59,6 +60,8 @@ class RaisedButton(ThemeBehaviour, RippleBehavior, ElevationBehaviour, ButtonBeh
 								   size=self.size,
 								   pos=self.pos)
 		super(RaisedButton, self).__init__(**kwargs)
+		self.elevation_press_anim = Animation(_elevation=self.elevation_raised, duration=.2, t='out_quad')
+		self.elevation_release_anim = Animation(_elevation=self.elevation_normal, duration=.2, t='out_quad')
 		self.background_color = self._theme_cls.primary_color if not self.disabled else self._theme_cls.disabled_color
 		self.ripple_color = self._theme_cls.accent_color
 
@@ -69,10 +72,38 @@ class RaisedButton(ThemeBehaviour, RippleBehavior, ElevationBehaviour, ButtonBeh
 						auto_color=self._update_text,
 						color_style=self._update_text)
 
-	# def on_disabled(self, instance, value):
-	# 	super(RaisedButton, self).on_disabled(instance, value)
-	# 	if self.disabled:
-	# 		self.background_color = self._theme_cls.disabled_color
+
+	def on_disabled(self, instance, value):
+		super(RaisedButton, self).on_disabled(instance, value)
+		if self.disabled:
+			self.background_color = self._theme_cls.disabled_color
+			self._elevation = 0
+		else:
+			self.background_color = self._theme_cls.primary_color
+
+	def on_state(self, *args):
+		if self.state == 'down':
+			self.background_color = self._theme_cls.btn_down_color
+		else:
+			self.background_color = self._theme_cls.primary_color
+
+	def on_touch_down(self, touch):
+		if not self.disabled:
+			if touch.is_mouse_scrolling:
+				return False
+			if not self.collide_point(touch.x, touch.y):
+				return False
+			if self in touch.ud:
+				return False
+			self.elevation_press_anim.stop(self)
+			self.elevation_press_anim.start(self)
+		super(RaisedButton, self).on_touch_down(touch)
+
+	def on_touch_up(self, touch):
+		if not self.disabled:
+			self.elevation_release_anim.stop(self)
+			self.elevation_release_anim.start(self)
+		super(RaisedButton, self).on_touch_up(touch)
 
 	def _update_text(self, *args):
 		self.label.auto_color = self.auto_color

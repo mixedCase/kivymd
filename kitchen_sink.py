@@ -28,8 +28,8 @@ class MainWidget(ThemeBehaviour, MaterialRelativeLayout):
 
 		self.background_color = self._theme_cls.main_background_color
 
-		self.toolbar.nav_button = ["md-view-headline", lambda: self.nav.toggle()]
-		# self.toolbar.add_action_button("md-view-headline")
+		self.toolbar.nav_button = ["md-menu", lambda: self.nav.toggle()]
+		self.toolbar.add_action_button("md-refresh")
 
 
 		self.cat1 = NavigationDrawerCategory(subheader=False)

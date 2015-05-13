@@ -15,8 +15,8 @@ class RippleBehavior(object):
 	ripple_pos = ListProperty([0, 0])
 	ripple_color = ListProperty()
 	ripple_duration_in = NumericProperty(.3)
-	ripple_duration_out = NumericProperty(.5)
-	ripple_fade_to_alpha = NumericProperty(.7)
+	ripple_duration_out = NumericProperty(.3)
+	ripple_fade_to_alpha = NumericProperty(.5)
 	ripple_scale = NumericProperty(2.75)
 	ripple_func_in = StringProperty('linear')
 	ripple_func_out = StringProperty('out_quad')
@@ -37,6 +37,7 @@ class RippleBehavior(object):
 						t=self.ripple_func_in,
 						ripple_color=[rc[0], rc[1], rc[2], self.ripple_fade_to_alpha],
 						duration=self.ripple_duration_in)
+					anim.bind(on_complete=self.remove_ripple)
 					anim.start(self)
 					with self.canvas.after:
 						StencilPush()
@@ -64,15 +65,13 @@ class RippleBehavior(object):
 	def set_color(self, instance, value):
 		self.col_instruction.rgba = value
 
-	def on_touch_up(self, touch):
-
+	def remove_ripple(self, *args):
 		rc = self.ripple_color
 		anim = Animation(
 			ripple_color=[rc[0], rc[1], rc[2], 0.],
 			t=self.ripple_func_out, duration=self.ripple_duration_out)
 		anim.bind(on_complete=self.anim_complete)
 		anim.start(self)
-		return super(RippleBehavior, self).on_touch_up(touch)
 
 	def anim_complete(self, anim, instance):
 		self.ripple_rad = 10

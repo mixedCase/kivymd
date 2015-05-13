@@ -43,7 +43,7 @@ class Toolbar(ThemeBehaviour, MaterialRelativeLayout):
 	def __init__(self, auto_color=True, color_style=None, **kwargs):
 		self.color_style = color_style
 		self.auto_color = auto_color
-		self._lbl_title = MaterialLabel(font_style='Headline',
+		self._lbl_title = MaterialLabel(font_style='Subhead',
 										theme_color='Primary',
 										auto_color=self.auto_color,
 										color_style=self.color_style,
