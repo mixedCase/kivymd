@@ -12,27 +12,23 @@ from label import MaterialLabel
 from divider import Divider
 
 
-class List(MaterialRelativeLayout):
+class List(MaterialGridLayout):
 
 	def __init__(self, **kwargs):
 		super(List, self).__init__(**kwargs)
-		self.gl = MaterialGridLayout(cols=1,
-		                             padding=(0, m_res.LIST_VERTICAL_PADDING,
-		                                      0, m_res.LIST_VERTICAL_PADDING),
-		                             height=2 * m_res.LIST_VERTICAL_PADDING,
-		                             size_hint_y=None)
-		self.add_widget(self.gl)
+		self.cols=1
+		self.padding = (0, m_res.LIST_VERTICAL_PADDING,
+		           0, m_res.LIST_VERTICAL_PADDING)
+		self.height = 2 * m_res.LIST_VERTICAL_PADDING
+		self.size_hint_y = None
 
 	def add_widget(self, widget, index=0):
-		if isinstance(widget, _ListItem):
-			self.gl.add_widget(widget)
-			self.gl.height += widget.height
-		else:
-			super(List, self).add_widget(widget, index)
+		self.height += widget.height
+		super(List, self).add_widget(widget, index)
 
 	def clear(self):
-		self.gl.height = 2 * m_res.LIST_VERTICAL_PADDING
-		self.gl.clear_widgets()
+		self.height = 2 * m_res.LIST_VERTICAL_PADDING
+		self.clear_widgets()
 
 
 class _ListItem(ButtonBehavior, MaterialRelativeLayout):
