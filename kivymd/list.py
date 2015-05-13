@@ -95,12 +95,12 @@ class _ListItemWithImage(_ListItem):
 
 
 class SingleLineItem(_ListItem):
-	height = dp(48)
 	text_top_padding = dp(16)
 	text_bottom_padding = dp(20)
 
 	def __init__(self, **kwargs):
 		super(SingleLineItem, self).__init__(**kwargs)
+		self.height = dp(48)
 
 
 class SingleLineItemWithIcon(SingleLineItem, _ListItemWithImage):
