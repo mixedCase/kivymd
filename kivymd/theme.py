@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 __version__ = "0.0.1"
 
+from kivy.app import App
+from kivy.core.text import LabelBase
 from kivy.uix.widget import Widget
-from kivy.properties import StringProperty, OptionProperty, AliasProperty, ListProperty
-from kivymd.material_resources import get_rgba_color
+from kivy.properties import (StringProperty, OptionProperty, AliasProperty,
+							 ObjectProperty, BooleanProperty)
+from kivymd.material_resources import get_rgba_color, FONTS, is_light_color
 
 
 class ThemeManager(Widget):
@@ -14,12 +17,11 @@ class ThemeManager(Widget):
 		This is a work in progress and not a complete implementation of all the parts of
 		the official Material Design.
 
-	To create an instance of the Theme Manager in you app::
+	To use the Theme Manager, add a :attr:`theme_cls` to your :class:`kivy.app.App()` instance::
 
 		from kivymd.theme import ThemeManager
 
-		# Create the manager
-		theme_manager = ThemeManager()
+		theme_cls = ThemeManager()
 
 
 	**Theme style**
@@ -28,7 +30,7 @@ class ThemeManager(Widget):
 	background color of the app::
 
 		# Set the overall theme style by choosing between ``Light`` or ``Dark``
-		theme_manager.theme_style = 'Dark'
+		self.theme_cls.theme_style = 'Dark'
 
 	This will determine the background colors and text colors:
 
@@ -55,7 +57,7 @@ class ThemeManager(Widget):
 	and one for the accent colors::
 
 		# Set the primary color palette
-		theme_manager.primary_palette = 'Blue'
+		self.theme_cls.primary_palette = 'Blue'
 
 	These color palettes comprises primary and accent colors that can be used for illustration or
 	to develop your brand colors. They’ve been designed to work harmoniously with each other.
@@ -77,18 +79,18 @@ class ThemeManager(Widget):
 	default hues can be customized::
 
 		# Set the primary color hue to '400'
-		theme_manager.primary_hue = '400'
+		self.theme_cls.primary_hue = '400'
 
 		# Set the primary dark hue to '900'
-		theme_manager.primary_dark_hue = '900'
+		self.theme_cls.primary_dark_hue = '900'
 
 		# Set the primary light hue to '200'
-		theme_manager.primary_light_hue = '200'
+		self.theme_cls.primary_light_hue = '200'
 
 	The :attr:`accent_palette` is used to set the accent color in the app::
 
 		# Set the accent color to 'Red'
-		theme_manager.accent_palette = 'Red'
+		self.theme_cls.accent_palette = 'Red'
 
 	The :attr:`accent_color` should be used for primary action buttons and components
 	like switches or sliders. The main accent color uses the ``A200`` hue but if
@@ -102,15 +104,23 @@ class ThemeManager(Widget):
 	These default accent color hues can also be customized::
 
 		# Set the accent color main hue to 'A400'
-		theme_manager.accent_hue = 'A400'
+		self.theme_cls.accent_hue = 'A400'
 
 		# Set the darker fallback accent color to 'A700'
-		theme_manager.accent_dark_hue = 'A700'
+		self.theme_cls.accent_dark_hue = 'A700'
 
 
 
-	**Text color**
+	**Fonts and Text color**
 
+
+	The Kivy Material Design theme uses Roboto as the default font and Material
+	Design Iconic font for icons. When an instance of :class:`ThemeManager()` is
+	initialized these fonts are registered with :class:`kivy.core.text.LabelBase()`.
+
+	.. note:
+		For more information on the amazing Material Design Iconic Font, go to
+		http://zavoloklom.github.io/material-design-iconic-font/
 
 	The color of the text within the app is determined primarily by the :attr:`theme_style`.
 	Different text blocks should be separated by their importance relative to other text:
@@ -429,64 +439,66 @@ class ThemeManager(Widget):
 	:class:`kivy.properties.AliasProperty` and defaults to ``Teal A400`` in rgb format.
 	"""
 
-	def _get_primary_text_color(self):
-		if self.theme_style == 'Light':
+	def primary_text_color(self, style=None):
+		if style == None:
+			style = self.theme_style
+		if style == 'Light':
 			return get_rgba_color(['Dark', 'Black'], control_alpha=0.87)
-		if self.theme_style == 'Dark':
+		if style == 'Dark':
 			return get_rgba_color(['Light', 'White'], control_alpha=1.0)
 
-	primary_text_color = AliasProperty(_get_primary_text_color, bind=('theme_style', ))
-	"""**(Read only)** :attr:`primary_text_color` holds the primary text color.
+		return get_rgba_color(['Dark', 'Black'], control_alpha=0.87)
+	"""**(Read only)** :attr:`primary_text_color(style=None)` returns the primary text color.
 
-	This is determined by the :attr:`theme_style`:
+	This is by default determined by the :attr:`theme_style`:
 
 	* :class:`ThemeManager.theme_style('Light')` sets the :attr:`primary_text_color` to 87% black (in rgb)
 	* :class:`ThemeManager.theme_style('Dark')` sets the :attr:`primary_text_color` to 100% white (in rgb)
 
-	The :attr:`primary_text_color` is a
-	:class:`kivy.properties.AliasProperty` and defaults to 87% black in rgb.
+	You can however choose the desired style by passing it as an argument.
 	"""
 
-	def _get_secondary_text_color(self):
-		if self.theme_style == 'Light':
+	def secondary_text_color(self, style=None):
+		if style == None:
+			style = self.theme_style
+		if style == 'Light':
 			return get_rgba_color(['Dark', 'Black'], control_alpha=0.54)
-		if self.theme_style == 'Dark':
+		if style == 'Dark':
 			return get_rgba_color(['Light', 'White'], control_alpha=0.70)
+		return get_rgba_color(['Dark', 'Black'], control_alpha=0.54)
+	"""**(Read only)** :attr:`secondary_text_color` returns the secondary text color.
 
-	secondary_text_color = AliasProperty(_get_secondary_text_color, bind=('theme_style', ))
-	"""**(Read only)** :attr:`secondary_text_color` holds the secondary text color.
-
-	This is determined by the :attr:`theme_style`:
+	This is by default determined by the :attr:`theme_style`:
 
 	* :class:`ThemeManager.theme_style('Light')` sets the :attr:`secondary_text_color` to 54% black (in rgb)
 	* :class:`ThemeManager.theme_style('Dark')` sets the :attr:`secondary_text_color` to 70% white (in rgb)
 
-	The :attr:`secondary_text_color` is a
-	:class:`kivy.properties.AliasProperty` and defaults to 54% black in rgb.
+	You can however choose the desired style by passing it as an argument.
 	"""
 
-	def _get_hint_text_color(self):
+	def _get_hint_text_color(self, style=None):
+		if style == None:
+			style = self.theme_style
 		if self.theme_style == 'Light':
 			return get_rgba_color(['Dark', 'Black'], control_alpha=0.54)
 		if self.theme_style == 'Dark':
 			return get_rgba_color(['Light', 'White'], control_alpha=0.70)
+		return get_rgba_color(['Dark', 'Black'], control_alpha=0.54)
 
-	hint_text_color = AliasProperty(_get_hint_text_color, bind=('theme_style', ))
-	"""**(Read only)** :attr:`hint_text_color` holds the hint text color. This is determined by the
-	:attr:`theme_style`:
+	hint_text_color = AliasProperty(_get_hint_text_color, bind=None)
+	"""**(Read only)** :attr:`hint_text_color` returns the hint text color.
+
+	This is by default determined by the :attr:`theme_style`:
 
 	* :class:`ThemeManager.theme_style('Light')` sets the :attr:`hint_text_color` to 26% black (in rgb)
 	* :class:`ThemeManager.theme_style('Dark')` sets the :attr:`hint_text_color` to 30% white (in rgb)
 
-	The :attr:`hint_text_color` is a
-	:class:`kivy.properties.AliasProperty` and defaults to 26% black in rgb.
+	You can however choose the desired style by passing it as an argument.
 	"""
 
-	disabled_color = AliasProperty(_get_hint_text_color, bind=('hint_text_color', ))
+	disabled_color = AliasProperty(_get_hint_text_color, bind=None)
 	"""The :attr:`disabled_color` is the same as :attr:`hint_text_color` and is only there to make things more clear.
 
-	The :attr:`disabled_color` is a
-	:class:`kivy.properties.AliasProperty` and defaults to 26% black in rgb.
 	"""
 
 	def _get_divider_color(self):
@@ -525,7 +537,7 @@ class ThemeManager(Widget):
 
 	To change the :attr:`error_color` use::
 
-		theme_manager.error_color = ['Red', '900']
+		self.theme_cls.error_color = ['Red', '900']
 
 	The :attr:`error_color` is a
 	:class:`kivy.properties.AliasProperty` and defaults to ``Red A700`` in rgb.
@@ -533,3 +545,59 @@ class ThemeManager(Widget):
 
 	def __init__(self, **kwargs):
 		super(ThemeManager, self).__init__(**kwargs)
+
+		for font in FONTS:
+			LabelBase.register(**font)
+
+
+class ThemeBehaviour(object):
+	""":class:`ThemeBehaviour` is a mixin class to make widgets aware of
+	an existing theme. This is used by all widgets in this theme, for example
+	:class:`kivymd.label.MaterialLabel()`::
+
+		class MaterialLabel(ThemeBehaviour, Label, BackgroundColorCapableWidget)
+
+	.. note::
+		If the main app doesn't have the :attr:`theme_cls` attribute, a widget with
+		a :class:`ThemeBehaviour` will initiate an instance of :class:`ThemeManager()`
+		and use the default settings.
+	"""
+
+	auto_color = BooleanProperty(True)
+	"""If True, the widget will automatically try to check the color of the background
+	in order to decide whether to use a dark or light text color.
+
+	The :attr:`auto_color` is a
+	:class:`kivy.properties.BooleanProperty` and defaults to ``True``.
+	"""
+
+	def _is_light(self):
+		if hasattr(self, 'has_background'):
+			if self.has_background:
+				return is_light_color(self.background_color)
+
+		parent = self
+		while True:
+			parent = parent.parent
+			if hasattr(parent, 'has_background'):
+				if parent.has_background and self.collide_widget(parent):
+					return is_light_color(parent.background_color)
+					break
+			if not hasattr(parent, 'parent'):
+				break
+
+		return True
+
+	has_light_background = AliasProperty(_is_light, bind=None)
+	"""Check if the widgets background color is light.
+
+	"""
+
+	_theme_cls = ObjectProperty()
+
+	def __init__(self, **kwargs):
+		if hasattr(App.get_running_app(), 'theme_cls'):
+			self._theme_cls = App.get_running_app().theme_cls
+		else:
+			self._theme_cls = ThemeManager()
+		super(ThemeBehaviour, self).__init__(**kwargs)

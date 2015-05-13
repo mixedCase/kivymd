@@ -6,7 +6,7 @@ from kivy import platform
 from kivy.utils import get_color_from_hex
 from copy import deepcopy
 from kivymd.md_icon_definitions import md_icons
-from kivymd.color_definitions import colors
+from kivymd.color_definitions import colors, light_colors
 
 # Feel free to override this const if you're designing for a device such as
 # a GNU/Linux tablet.
@@ -36,6 +36,30 @@ FONT_MEDIUM = kivymd.fonts_path + "Roboto-Medium.ttf"
 FONT_BOLD = kivymd.fonts_path + "Roboto-Bold.ttf"
 FONT_ICONS = kivymd.fonts_path + "Material-Design-Iconic-Font.ttf"
 ICON_DEFAULT = kivymd.images_path + "ic_lens_grey_48dp.png"
+
+
+FONTS = [
+    {
+        "name": "Roboto",
+        "fn_regular": kivymd.fonts_path + 'Roboto-Regular.ttf',
+        "fn_bold": kivymd.fonts_path + 'Roboto-Medium.ttf',
+		"fn_italic": kivymd.fonts_path + 'Roboto-Italic.ttf',
+		"fn_bolditalic": kivymd.fonts_path + 'Roboto-MediumItalic.ttf'
+    },
+    {
+        "name": "RobotoLight",
+        "fn_regular": kivymd.fonts_path + 'Roboto-Thin.ttf',
+		"fn_bold": kivymd.fonts_path + 'Roboto-Light.ttf',
+		"fn_italic": kivymd.fonts_path + 'Roboto-ThinItalic.ttf',
+		"fn_bolditalic": kivymd.fonts_path + 'Roboto-LightItalic.ttf'
+    },
+	{
+        "name": "Icons",
+        "fn_regular": kivymd.fonts_path + 'Material-Design-Iconic-Font.ttf'
+    }
+]
+
+
 
 # While theming is not implemented, use light background settings
 TEXT_COLOR = (0, 0, 0, 1)
@@ -121,6 +145,34 @@ def get_rgba_color(color_tuple, control_alpha=None):
 	else:
 		color[3] = control_alpha
 		return color
+
+def get_hex_from_rgba_color(color):
+	hex_values = []
+
+	for component in color:
+		hex_values.append(hex(int(component * 255))[2:])
+
+	return ''.join(hex_values)
+
+def is_light_color(color=[]):
+	if len(color) == 2:
+		return True if color[1] in light_colors[color[0]] else False
+	elif len(color) > 2:
+		hex_color = get_hex_from_rgba_color(color)[:6]
+		color_tuple = []
+		for name, hues in colors.iteritems():
+			if not len(color_tuple) == 2:
+				for hue, color in hues.iteritems():
+					if color == hex_color:
+						color_tuple.append(name)
+						color_tuple.append(hue)
+						break
+			else:
+				break
+		if len(color_tuple) == 2:
+			return True if color_tuple[1] in light_colors[color_tuple[0]] else False
+
+	return True
 
 
 def get_palette_with_alpha(palette, alpha_level=1.):

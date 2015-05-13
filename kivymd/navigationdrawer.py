@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+from kivy.app import App
 from kivy.uix.image import Image as Image
-from kivy.properties import StringProperty, BooleanProperty
+from kivy.properties import StringProperty, BooleanProperty, ObjectProperty
 from kivy.metrics import dp
 from kivy.core.window import Window
 from kivy.uix.scrollview import ScrollView
@@ -8,12 +9,13 @@ from kivy.uix.scrollview import ScrollView
 from kivymd import material_resources as m_res
 from divider import Divider
 from slidingpanel import SlidingPanel
-from layouts import MaterialRelativeLayout, MaterialGridLayout
+from layouts import MaterialRelativeLayout, MaterialGridLayout, BackgroundColorCapableWidget
 from label import MaterialLabel
 from button import MaterialButtonBlank
+from theme import ThemeBehaviour
 
 
-class NavigationDrawer(SlidingPanel):
+class NavigationDrawer(ThemeBehaviour, SlidingPanel, BackgroundColorCapableWidget):
 	"""Implementation of the Navigation Drawer pattern."""
 
 	header_img = StringProperty()
@@ -30,7 +32,7 @@ class NavigationDrawer(SlidingPanel):
 								keep_ratio=False,
 								mipmap=True)
 		super(NavigationDrawer, self).__init__(**kwargs)
-		self.background_color = (1, 1, 1, 1)
+		self.background_color = self._theme_cls.dialog_background_color
 		self.header_img = header_img
 		self._header_bg.height = self.width * 9 / 16
 		self.header_divider = Divider()
@@ -101,7 +103,7 @@ class NavigationDrawer(SlidingPanel):
 			raise Exception("Nav drawer can only be on the left side")
 
 
-class NavigationDrawerCategory(MaterialRelativeLayout):
+class NavigationDrawerCategory(ThemeBehaviour, MaterialRelativeLayout, BackgroundColorCapableWidget):
 	name = StringProperty('Category')
 	divider = BooleanProperty(True)
 	subheader = BooleanProperty(True)
@@ -111,9 +113,9 @@ class NavigationDrawerCategory(MaterialRelativeLayout):
 									   text=self.name,
 									   x=dp(16),
 									   height=dp(48),
-									   style="medium")
+									   font_style='Title',
+									   auto_color=True)
 		self.bind(name=self._lbl_name.setter('text'))
-		self._lbl_name.color = [0, 0, 0, 0.54]
 		self._bl_items = MaterialGridLayout(orientation="vertical",
 											size_hint_y=None,
 											height=0,
@@ -169,16 +171,16 @@ class NavigationDrawerCategory(MaterialRelativeLayout):
 		self.height = self._lbl_name.height + item_list_height
 
 
-class NavigationDrawerButton(MaterialButtonBlank):
+class NavigationDrawerButton(ThemeBehaviour, MaterialButtonBlank, BackgroundColorCapableWidget):
 	text = StringProperty()
 
 	def __init__(self, **kwargs):
-		self.ripple_color = \
-			m_res.get_palette_with_alpha(m_res.PALETTE_GREY)["400"]
 		self._lbl = MaterialLabel(x=self.x + dp(72),
-								  color=(0, 0, 0, 1),
-								  style="medium")
+								  font_style='Subhead',
+								  auto_color=True)
 		super(NavigationDrawerButton, self).__init__(**kwargs)
+		self.ripple_color = self._theme_cls.accent_color
+
 		self.height = m_res.TOUCH_TARGET_HEIGHT
 
 		self._icon = Image(size_hint=(None, None),

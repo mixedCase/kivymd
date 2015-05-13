@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
-from kivy.properties import StringProperty, ListProperty
+from kivy.app import App
+from kivy.properties import StringProperty, ListProperty, OptionProperty
 from kivy.uix.boxlayout import BoxLayout as _BoxLayout
 from kivy.metrics import dp
+from kivy.clock import Clock
 
 from kivymd import material_resources as m_res
 from layouts import MaterialRelativeLayout
 from label import MaterialLabel
 from button import MaterialIcon
+from theme import ThemeBehaviour
 
 
-class Toolbar(MaterialRelativeLayout):
+class Toolbar(ThemeBehaviour, MaterialRelativeLayout):
 	"""A toolbar as found on many Material Design/Android apps
 
 	.. warning::
@@ -31,22 +34,35 @@ class Toolbar(MaterialRelativeLayout):
 	If the icon (first value) is set to None the button will be hidden.
 
 	Example:
-		("\xf00c", self.my_callback_method)
+		("md-view-headline", self.my_callback_method)
 	"""
 
-	def __init__(self, **kwargs):
-		self._lbl_title = MaterialLabel(style="bold",
+	color_style = OptionProperty(None, options=['Light', 'Dark'], allownone=True)
+
+
+	def __init__(self, auto_color=True, color_style=None, **kwargs):
+		self.color_style = color_style
+		self.auto_color = auto_color
+		self._lbl_title = MaterialLabel(font_style='Headline',
+										theme_color='Primary',
+										auto_color=self.auto_color,
+										color_style=self.color_style,
 										text=self.title,
-										pos=(dp(24), 0))
+										pos=(dp(24), 0),
+										halign='left',
+										valign='middle')
 		super(Toolbar, self).__init__(**kwargs)
+
 		self.size_hint_y = None
 		self.height = dp(48)
 		self.spacing = dp(1)
-		self.background_color = (0, 0.5882352941176471, 0.5333333333333333, 1)
+		self.background_color = self._theme_cls.primary_color
 
-		self._nav_button = MaterialIcon(size_hint_x=None,
+		self._nav_button = MaterialIcon(size_hint=(None, None),
 										size=(0, dp(48)),
-										pos=(dp(12), 0))
+										pos=(dp(12), 0),
+										auto_color=self.auto_color,
+										color_style=self.color_style)
 
 		self._bl_action_buttons = _BoxLayout(size_hint_x=None, width=0)
 		self._action_buttons = []
@@ -61,11 +77,11 @@ class Toolbar(MaterialRelativeLayout):
 	# somehow makes it bug, so we set it at the end of __init__
 
 	def on_nav_button(self, instance, value):
-		self._nav_button.icon = value[0]
 		if value[0] == '':
 			self._nav_button.width = 0
 			self._lbl_title.x = dp(24)
 		else:
+			self._nav_button.icon = value[0]
 			self._nav_button.width = dp(48)
 			self._lbl_title.x = dp(72)
 		if value[1] == None:
@@ -81,8 +97,10 @@ class Toolbar(MaterialRelativeLayout):
 		:param action: Function set to trigger when on_release fires
 		:type action: function or None
 		"""
-		button = MaterialIcon(size=(dp(48), dp(48)))
-		button.icon = icon
+		button = MaterialIcon(size=(dp(48), dp(48)),
+							  icon=icon,
+							  auto_color=self.auto_color,
+							  color_style=self.color_style)
 		if action:
 			button.bind(on_release=action)
 
@@ -123,3 +141,9 @@ class Toolbar(MaterialRelativeLayout):
 
 	def on_title(self, instance, value):
 		self._lbl_title.text = value
+		Clock.schedule_once(self.fix_title, 0)
+
+	def fix_title(self, *arga):
+		self._lbl_title.width = self._lbl_title.texture_size[0]
+		# self._lbl_title.text_size = self._lbl_title.size
+		self._refresh_action_buttons()

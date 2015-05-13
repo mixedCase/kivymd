@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from kivy.properties import StringProperty, NumericProperty, BooleanProperty
+
+from kivy.properties import StringProperty, NumericProperty, BooleanProperty, ObjectProperty
 from kivy.metrics import dp, sp
 from kivy.uix.image import Image
 from kivy.uix.scrollview import ScrollView
@@ -43,6 +44,7 @@ class _ListItem(ButtonBehavior, MaterialRelativeLayout):
 	divider = BooleanProperty(True)
 
 	def __init__(self, **kwargs):
+
 		self.size_hint_y = None
 		self.bl_text = MaterialBoxLayout(
 			orientation="vertical",
@@ -51,8 +53,7 @@ class _ListItem(ButtonBehavior, MaterialRelativeLayout):
 			padding=[0, self.text_top_padding,
 					 m_res.HORIZ_MARGINS, self.text_bottom_padding])
 		self.bind(height=self.bl_text.setter('height'))
-		self.lbl_primary = MaterialLabel(color=m_res.TEXT_COLOR,
-										 font_size=sp(16))
+		self.lbl_primary = MaterialLabel(font_style='Subhead')
 		self._divider = Divider()
 		self.bl_text.bind(x=self._divider.setter('x'),
 						  width=self._divider.setter('width'))
@@ -124,8 +125,8 @@ class TwoLineItem(_ListItem):
 	def __init__(self, **kwargs):
 		self.text_top_padding = dp(20)
 		self.text_bottom_padding = dp(20)
-		self.lbl_secondary = MaterialLabel(color=m_res.SECONDARY_TEXT_COLOR,
-										   font_size=sp(14))
+		self.lbl_secondary = MaterialLabel(font_style='Body2',
+										   theme_color='Secondary')
 		super(TwoLineItem, self).__init__(**kwargs)
 		self.height = dp(72)
 		self.bl_text.spacing = dp(8)
