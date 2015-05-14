@@ -6,7 +6,7 @@ kivy.require('1.9.0')
 
 from kivy.app import App
 from kivy.metrics import dp
-from kivymd.bottom_sheet import BottomSheet
+from kivymd.bottom_sheet import BottomSheet, SingleLineItem
 from kivymd.layouts import MaterialRelativeLayout
 from kivymd.toolbar import Toolbar
 from kivymd.navigationdrawer import NavigationDrawer, NavigationDrawerButton, \
@@ -50,7 +50,10 @@ class MainWidget(MaterialRelativeLayout):
 		self.add_widget(self.nav)
 
 	def open_bottom_sheet(self):
-		BottomSheet().open()
+		bottom_sheet = BottomSheet()
+		for i in range(0, 30):
+			bottom_sheet.add_item(SingleLineItem(text="Test", divider=False))
+		bottom_sheet.open()
 
 	def on_width(self, instance, value):
 		self.toolbar.width = value

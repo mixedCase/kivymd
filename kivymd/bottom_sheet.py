@@ -9,7 +9,7 @@ from kivymd.slidingmodal import ExpandableSlidingModal
 
 class BottomSheet(ExpandableSlidingModal):
 
-	header = StringProperty("Lel")
+	header = StringProperty("Title")
 
 	def __init__(self, **kwargs):
 		self.orientation = "vertical"
@@ -30,8 +30,6 @@ class BottomSheet(ExpandableSlidingModal):
 		self.add_widget(self.subheader)
 		self.add_widget(self.sv)
 
-		for i in range(0, 30):
-			self.add_item(SingleLineItem(text="Test", divider=False))
 
 	def on_header(self, instance, value):
 		self.subheader.text = value
@@ -63,3 +61,17 @@ class BottomSheet(ExpandableSlidingModal):
 
 	def remove_item(self, widget):
 		self.list.remove_widget(widget)
+
+	def on_touch_down(self, touch):
+		self._set_touch_down_attr(touch)
+		if self.sv.collide_point(*touch.pos):
+			self._touch = touch
+			return True
+		else:
+			self._touch = None
+		return super(BottomSheet, self).on_touch_down(touch)
+
+	def on_touch_up(self, touch):
+		if self._touch and not self._moved:
+			return super(BottomSheet, self).on_touch_down(touch)
+		return super(BottomSheet, self).on_touch_up(touch)

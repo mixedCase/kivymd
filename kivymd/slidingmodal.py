@@ -97,10 +97,15 @@ class ExpandableSlidingModal(SlidingModal):
 	max_height = NumericProperty()
 
 	def on_touch_down(self, touch):
-		self._touch_pos = touch.pos
+		self._set_touch_down_attr(touch)
 		return super(ExpandableSlidingModal, self).on_touch_down(touch)
 
+	def _set_touch_down_attr(self, touch):
+		self._touch_pos = touch.pos
+		self._moved = False
+
 	def on_touch_move(self, touch):
+		self._moved = True
 		if self.side == "bottom":
 			new_height = self.height + (touch.pos[1] - self._touch_pos[1])
 			self._touch_pos = touch.pos
@@ -123,4 +128,4 @@ class ExpandableSlidingModal(SlidingModal):
 
 	def on_touch_up(self, touch):
 		self._touch_pos = None
-		return super(SlidingModal, self).on_touch_move(touch)
+		return super(ExpandableSlidingModal, self).on_touch_up(touch)

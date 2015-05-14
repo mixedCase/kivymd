@@ -35,6 +35,7 @@ class _ListItem(ButtonBehavior, MaterialRelativeLayout):
 	text_bottom_padding = NumericProperty(0)
 	text = StringProperty()
 	divider = BooleanProperty(True)
+	ripple_behavior = BooleanProperty(True)
 
 	def __init__(self, **kwargs):
 		self.size_hint_y = None
@@ -55,7 +56,8 @@ class _ListItem(ButtonBehavior, MaterialRelativeLayout):
 		self.add_widget(self.bl_text)
 
 		self.add_widget(self._divider)
-		self.add_widget(RippleLayout())
+		if self.ripple_behavior:
+			self.add_widget(RippleLayout())
 
 	def on_width(self, instance, value):
 		self.bl_text.width = self.width - self.bl_text.x
@@ -100,7 +102,9 @@ class SingleLineItem(_ListItem):
 
 
 class SubheaderLineItem(SingleLineItem):
+
 	def __init__(self, **kwargs):
+		self.ripple_behavior = False
 		super(SubheaderLineItem, self).__init__(**kwargs)
 		self.lbl_primary.color = (0, 0, 0, 0.54)
 
