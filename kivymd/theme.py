@@ -420,6 +420,33 @@ class ThemeManager(Widget):
 	:class:`kivy.properties.AliasProperty` and defaults to ``Teal A200`` in rgb format.
 	"""
 
+	_ripple_color = StringProperty(None, allownone=True)
+	_ripple_weight = StringProperty(None, allownone=True)
+	def _get_ripple_color(self):
+		if self._ripple_color == None or self._ripple_weight == None:
+			return get_rgba_color([self.accent_palette, self.accent_hue])
+		else:
+			return get_rgba_color([self._ripple_color, self._ripple_weight])
+
+	def _set_ripple_color(self, color_tuple):
+		try:
+			color, weight = color_tuple
+			self._ripple_color = color
+			self._ripple_weight = weight
+		except ValueError as e:
+			print e.message
+
+	ripple_color = AliasProperty(_get_ripple_color, _set_ripple_color, bind=('accent_palette', 'accent_hue',
+																			 '_ripple_color', '_ripple_weight'))
+	"""´:attr:`ripple_color` is by default the same as the :attr:`accent_color`. You can however give
+	it another color by giving it a color tuple argument::
+
+		self.theme_cls.ripple_color = ['Grey', '700']
+
+	The :attr:`ripple_color` is a
+	:class:`kivy.properties.AliasProperty` and defaults to :attr:`accent_color` in rgb format.
+	"""
+
 	def _get_accent_light(self):
 		return get_rgba_color([self.accent_palette, self.accent_light_hue])
 

@@ -138,7 +138,7 @@ def get_rgba_color(color_tuple, control_alpha=None):
 	try:
 		color = get_color_from_hex(colors[color][weight])
 	except:
-		print('Error: ' + color + weight + ' not found, set to default')
+		print("Error: {} and/or {} not found, set to default".format(color, weight))
 		return (1., 1., 1., 1.)
 	if control_alpha is None:
 		return color
