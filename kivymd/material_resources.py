@@ -154,24 +154,35 @@ def get_hex_from_rgba_color(color):
 
 	return ''.join(hex_values)
 
+def get_color_tuple(color=[]):
+	hex_color = get_hex_from_rgba_color(color)[:6]
+	color_tuple = []
+	for name, hues in colors.iteritems():
+		for hue, color in hues.iteritems():
+			if color == hex_color:
+				color_tuple.append(name)
+				color_tuple.append(hue)
+				return color_tuple
+	return []
+
 def is_light_color(color=[]):
 	if len(color) == 2:
 		return True if color[1] in light_colors[color[0]] else False
 	elif len(color) > 2:
-		hex_color = get_hex_from_rgba_color(color)[:6]
-		color_tuple = []
-		for name, hues in colors.iteritems():
-			if not len(color_tuple) == 2:
-				for hue, color in hues.iteritems():
-					if color == hex_color:
-						color_tuple.append(name)
-						color_tuple.append(hue)
-						break
-			else:
-				break
+		# hex_color = get_hex_from_rgba_color(color)[:6]
+		# color_tuple = []
+		# for name, hues in colors.iteritems():
+		# 	if not len(color_tuple) == 2:
+		# 		for hue, color in hues.iteritems():
+		# 			if color == hex_color:
+		# 				color_tuple.append(name)
+		# 				color_tuple.append(hue)
+		# 				break
+		# 	else:
+		# 		break
+		color_tuple = get_color_tuple(color)
 		if len(color_tuple) == 2:
 			return True if color_tuple[1] in light_colors[color_tuple[0]] else False
-
 	return True
 
 

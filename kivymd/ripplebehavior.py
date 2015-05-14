@@ -17,20 +17,24 @@ class RippleBehavior(object):
 		Special thanks to github.com/Kovak/ for his work on FlatKivy, which provided
 		the basis for this class.
 	"""
-	ripple_rad = NumericProperty(10)
+	ripple_rad = NumericProperty()
+	ripple_rad_default = NumericProperty(30)
 	ripple_pos = ListProperty([0, 0])
 	ripple_color = ListProperty()
-	ripple_duration_in_fast = NumericProperty(.3)
+	ripple_duration_in_fast = NumericProperty(.2)
 	ripple_duration_in_slow = NumericProperty(2)
 	ripple_duration_out = NumericProperty(.3)
-	ripple_fade_to_alpha = NumericProperty(.5)
+	ripple_fade_to_alpha = NumericProperty(.2)
 	ripple_scale = NumericProperty(2.75)
-	ripple_func_in = StringProperty('linear')
+	ripple_func_in = StringProperty('out_quad')
 	ripple_func_out = StringProperty('out_quad')
-	ripple_press_timeout = NumericProperty(0.1)
+	ripple_press_timeout = NumericProperty(0.05)
 
 	_duration = NumericProperty()
+	_func_in = StringProperty()
+
 	def on_touch_down(self, touch):
+		self.ripple_rad = self.ripple_rad_default
 		if hasattr(self, 'disabled'):
 			if not self.disabled:
 				if self.collide_point(*touch.pos):
@@ -44,7 +48,7 @@ class RippleBehavior(object):
 					if hasattr(self, '_theme_cls'):
 						self.ripple_color = self._theme_cls.ripple_color
 					else:
-						self.ripple_color = [rc[0], rc[1], rc[2], .9]
+						self.ripple_color = [rc[0], rc[1], rc[2], .1]
 
 					Clock.schedule_once(r_callback, self.ripple_press_timeout)
 
@@ -79,8 +83,9 @@ class RippleBehavior(object):
 	def start_rippeling(self, touch, *args):
 		rc = self.ripple_color
 		self._duration = self.ripple_duration_in_slow if self.state == 'down' else self.ripple_duration_in_fast
+		self._func_in = "linear" if self.state == "down" else self.ripple_func_in
 		anim = Animation(ripple_rad=max(self.width, self.height) * self.ripple_scale,
-						  t=self.ripple_func_in,
+						  t=self._func_in,
 						  ripple_color=[rc[0], rc[1], rc[2], self.ripple_fade_to_alpha],
 						  duration=self._duration)
 		anim.bind(on_complete=self.anim_complete)
@@ -114,5 +119,4 @@ class RippleBehavior(object):
 		anim.start(self)
 
 	def anim_complete(self, anim, instance, *args):
-		self.ripple_rad = 10
 		self.canvas.after.clear()
