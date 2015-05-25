@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from kivy.app import App
+
 from kivy.uix.image import Image as Image
-from kivy.properties import StringProperty, BooleanProperty, ObjectProperty
+from kivy.properties import StringProperty, BooleanProperty, ListProperty
 from kivy.metrics import dp
 from kivy.core.window import Window
 from kivy.uix.scrollview import ScrollView
@@ -9,11 +9,11 @@ from kivy.uix.scrollview import ScrollView
 from kivymd import material_resources as m_res
 from divider import Divider
 from slidingpanel import SlidingPanel
-from layouts import MaterialRelativeLayout, MaterialGridLayout, BackgroundColorCapableWidget
+from layouts import MaterialRelativeLayout, MaterialGridLayout, BackgroundColorCapableWidget, MaterialFloatLayout
 from label import MaterialLabel
 from button import MaterialButtonBlank
 from theme import ThemeBehaviour
-
+from material_resources import get_rgba_color
 
 class NavigationDrawer(ThemeBehaviour, SlidingPanel, BackgroundColorCapableWidget):
 	"""Implementation of the Navigation Drawer pattern."""
@@ -113,8 +113,8 @@ class NavigationDrawerCategory(ThemeBehaviour, MaterialRelativeLayout, Backgroun
 									   text=self.name,
 									   x=dp(16),
 									   height=dp(48),
-									   font_style='Title',
-									   auto_color=True)
+									   font_style='Title')
+
 		self.bind(name=self._lbl_name.setter('text'))
 		self._bl_items = MaterialGridLayout(orientation="vertical",
 											size_hint_y=None,
@@ -174,13 +174,17 @@ class NavigationDrawerCategory(ThemeBehaviour, MaterialRelativeLayout, Backgroun
 class NavigationDrawerButton(ThemeBehaviour, MaterialButtonBlank, BackgroundColorCapableWidget):
 	text = StringProperty()
 
+	_background_color_down = ListProperty([])
+	_tmp_color = ListProperty([])
+
 	def __init__(self, **kwargs):
 		self._lbl = MaterialLabel(x=self.x + dp(72),
 								  font_style='Subhead',
-								  auto_color=True)
+								  valign='middle')
 		super(NavigationDrawerButton, self).__init__(**kwargs)
-		self.ripple_color = self._theme_cls.accent_color
-
+		self.ripple_color = self._theme_cls.ripple_color
+		self._background_color_down = get_rgba_color([self._theme_cls.theme_style, 'FlatButtonDown'],
+													 control_alpha=.4)
 		self.height = m_res.TOUCH_TARGET_HEIGHT
 
 		self._icon = Image(size_hint=(None, None),
@@ -200,3 +204,17 @@ class NavigationDrawerButton(ThemeBehaviour, MaterialButtonBlank, BackgroundColo
 	def on_pos(self, instance, value):
 		self._icon.pos = (value[0] + dp(16), value[1] + dp(12))
 		self._lbl.pos = (value[0] + dp(72), value[1])
+
+	def on_disabled(self, instance, value):
+		super(FlatButton, self).on_disabled(instance, value)
+		if self.disabled:
+			self.label.text_color = self._theme_cls.disabled_color
+		else:
+			self.label.text_color = self.text_color
+
+	def on_state(self, *args):
+		if self.state == 'down':
+			self._tmp_color = self.background_color
+			self.background_color = self._background_color_down
+		else:
+			self.background_color = self._tmp_color

@@ -313,13 +313,15 @@ colors = {
 	'Dark': {
 		'Black': '000000',
 		'MainBackground': '303030',
-		'DialogBackground': '424242'
+		'DialogBackground': '424242',
+		'FlatButtonDown': 'cccccc'
 	},
 
 	'Light': {
 		'White': 'ffffff',
 		'MainBackground': 'eeeeee',
-		'DialogBackground': 'fafafa'
+		'DialogBackground': 'fafafa',
+		'FlatButtonDown': '999999'
 	}
 }
 

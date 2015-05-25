@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 from threading import Timer as ThreadedTimer
 
 from kivy.properties import StringProperty, BooleanProperty, NumericProperty
@@ -26,8 +27,13 @@ class SlidingPanel(MaterialRelativeLayout):
 	"""How long will the animation last"""
 
 	def __init__(self, width=dp(200), **kwargs):
+		self.register_event_type('on_closed')
+		self.register_event_type('on_opening')
+		self.register_event_type('on_opened')
+		self.register_event_type('on_closing')
 		self.animation_open = Animation(duration=self.animation_length,
 										t="out_sine")
+		self.animation_open.bind(on_complete=lambda *x: self.dispatch('on_opened'))
 		self.animation_dismiss = Animation(duration=self.animation_length,
 										   t="out_sine")
 
@@ -37,6 +43,7 @@ class SlidingPanel(MaterialRelativeLayout):
 		self.orientation = "vertical"
 		self.width = width
 		self.size_hint = (None, None)
+		self.dispatch('on_closed')
 		self.status = "closed"
 		self.timer = None
 
@@ -57,6 +64,7 @@ class SlidingPanel(MaterialRelativeLayout):
 		if self.has_shadow:
 			self.shadow.fade_in(self.animation_length, add_to=self)
 		self.animation_open.start(self)
+		self.dispatch('on_opening')
 		self.status = "opening"
 		self.timer = ThreadedTimer(
 			self.animation_length + 0.1, self._fix_status).start()
@@ -66,8 +74,9 @@ class SlidingPanel(MaterialRelativeLayout):
 			return
 		self.update_animations()
 		if self.has_shadow:
-			self.shadow.fade_out(self.animation_length, remove_from=self)
+			self.shadow.fade_out(self.animation_length)
 		self.animation_dismiss.start(self)
+		self.dispatch('on_closing')
 		self.status = "closing"
 		self.timer = ThreadedTimer(
 			self.animation_length + 0.1, self._fix_status).start()
@@ -137,3 +146,15 @@ class SlidingPanel(MaterialRelativeLayout):
 
 	def _set_y(self, instance, value):
 		self.y = value
+
+	def on_closed(self):
+		pass
+
+	def on_opening(self):
+		pass
+
+	def on_opened(self):
+		pass
+
+	def on_closing(self):
+		pass

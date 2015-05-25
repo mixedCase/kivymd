@@ -21,7 +21,7 @@ class RippleBehavior(object):
 	ripple_rad_default = NumericProperty(30)
 	ripple_pos = ListProperty([0, 0])
 	ripple_color = ListProperty()
-	ripple_duration_in_fast = NumericProperty(.2)
+	ripple_duration_in_fast = NumericProperty(.3)
 	ripple_duration_in_slow = NumericProperty(2)
 	ripple_duration_out = NumericProperty(.3)
 	ripple_fade_to_alpha = NumericProperty(.2)

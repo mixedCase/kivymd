@@ -126,7 +126,7 @@ class TwoLineItem(_ListItem):
 		self.text_top_padding = dp(20)
 		self.text_bottom_padding = dp(20)
 		self.lbl_secondary = MaterialLabel(font_style='Body2',
-										   theme_color='Secondary')
+										   theme_text_color='Secondary')
 		super(TwoLineItem, self).__init__(**kwargs)
 		self.height = dp(72)
 		self.bl_text.spacing = dp(8)

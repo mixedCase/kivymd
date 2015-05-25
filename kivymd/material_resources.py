@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from collections import OrderedDict
 import kivymd
 from kivy.metrics import dp
 from kivy.core.window import Window
@@ -165,21 +166,20 @@ def get_color_tuple(color=[]):
 				return color_tuple
 	return []
 
+def get_btn_down_color(color=[]):
+	color_tuple = get_color_tuple(color)
+	ordered_palette = OrderedDict(sorted(colors[color_tuple[0]].items(), key=lambda x: int(x[0][1:]) if str.isalpha(x[0][:1]) else int(x[0])))
+	index = ordered_palette.keys().index(color_tuple[1])
+	try:
+		return get_rgba_color([color_tuple[0], ordered_palette.items()[index + 2][0]])
+	except:
+		return (0, 0, 0, 1)
+
+
 def is_light_color(color=[]):
 	if len(color) == 2:
 		return True if color[1] in light_colors[color[0]] else False
 	elif len(color) > 2:
-		# hex_color = get_hex_from_rgba_color(color)[:6]
-		# color_tuple = []
-		# for name, hues in colors.iteritems():
-		# 	if not len(color_tuple) == 2:
-		# 		for hue, color in hues.iteritems():
-		# 			if color == hex_color:
-		# 				color_tuple.append(name)
-		# 				color_tuple.append(hue)
-		# 				break
-		# 	else:
-		# 		break
 		color_tuple = get_color_tuple(color)
 		if len(color_tuple) == 2:
 			return True if color_tuple[1] in light_colors[color_tuple[0]] else False

@@ -19,6 +19,6 @@ class Divider(ThemeBehaviour, MaterialRelativeLayout):
 
 	def __init__(self, **kwargs):
 		super(Divider, self).__init__(**kwargs)
-		self.color = self._theme_cls.divider_color
+		self.color = self._theme_cls.divider_color()
 		self.size_hint_y = None
 		self.height = dp(1)

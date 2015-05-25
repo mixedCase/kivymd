@@ -148,7 +148,7 @@ class ThemeManager(Widget):
 			* Dark: :attr:`hint_text_color` = 30% white
 
 
-		:attr:`disabled_color` is the same color as :attr:`hint_text_color` and should be used for
+		:attr:`disabled_text_color` is the same color as :attr:`hint_text_color` and should be used for
 		disabled widgets such as :class:`MaterialFlatButton()`.
 
 
@@ -476,6 +476,7 @@ class ThemeManager(Widget):
 			return get_rgba_color(['Light', 'White'], control_alpha=1.0)
 
 		return get_rgba_color(['Dark', 'Black'], control_alpha=0.87)
+
 	"""**(Read only)** :attr:`primary_text_color(style=None)` returns the primary text color.
 
 	This is by default determined by the :attr:`theme_style`:
@@ -504,16 +505,15 @@ class ThemeManager(Widget):
 	You can however choose the desired style by passing it as an argument.
 	"""
 
-	def _get_hint_text_color(self, style=None):
+	def hint_text_color(self, style=None):
 		if style == None:
 			style = self.theme_style
 		if self.theme_style == 'Light':
-			return get_rgba_color(['Dark', 'Black'], control_alpha=0.54)
+			return get_rgba_color(['Dark', 'Black'], control_alpha=0.26)
 		if self.theme_style == 'Dark':
-			return get_rgba_color(['Light', 'White'], control_alpha=0.70)
+			return get_rgba_color(['Light', 'White'], control_alpha=0.30)
 		return get_rgba_color(['Dark', 'Black'], control_alpha=0.54)
 
-	hint_text_color = AliasProperty(_get_hint_text_color, bind=None)
 	"""**(Read only)** :attr:`hint_text_color` returns the hint text color.
 
 	This is by default determined by the :attr:`theme_style`:
@@ -524,27 +524,46 @@ class ThemeManager(Widget):
 	You can however choose the desired style by passing it as an argument.
 	"""
 
-	disabled_color = AliasProperty(_get_hint_text_color, bind=None)
-	"""The :attr:`disabled_color` is the same as :attr:`hint_text_color` and is only there to make things more clear.
+	def disabled_text_color(self, style=None):
+		if style == None:
+			style = self.theme_style
+		if self.theme_style == 'Light':
+			return get_rgba_color(['Dark', 'Black'], control_alpha=0.26)
+		if self.theme_style == 'Dark':
+			return get_rgba_color(['Light', 'White'], control_alpha=0.30)
+		return get_rgba_color(['Dark', 'Black'], control_alpha=0.54)
+
+	"""The :attr:`disabled_text_color` is the same as :attr:`hint_text_color` and is only there to make things more clear.
 
 	"""
 
-	def _get_divider_color(self):
+	def divider_color(self, style=None):
+		if style == None:
+			style = self.theme_style
 		if self.theme_style == 'Light':
 			return get_rgba_color(['Dark', 'Black'], control_alpha=0.12)
 		if self.theme_style == 'Dark':
 			return get_rgba_color(['Light', 'White'], control_alpha=0.12)
 
-	divider_color = AliasProperty(_get_divider_color, bind=('theme_style', ))
 	"""**(Read only)** :attr:`divider_color` holds the divider color. This is determined by the
 	:attr:`theme_style`:
 
 	* :class:`ThemeManager.theme_style('Light')` sets the :attr:`divider_color` to 12% black (in rgb)
 	* :class:`ThemeManager.theme_style('Dark')` sets the :attr:`divider_color` to 12% white (in rgb)
 
-	The :attr:`divider_color` is a
-	:class:`kivy.properties.AliasProperty` and defaults to 12% black in rgb.
 	"""
+
+	def disabled_bg_color(self, style=None):
+		if style == None:
+			style = self.theme_style
+		if self.theme_style == 'Light':
+			return get_rgba_color(['Dark', 'Black'], control_alpha=0.12)
+		if self.theme_style == 'Dark':
+			return get_rgba_color(['Light', 'White'], control_alpha=0.12)
+	"""The :attr:`disabled_bg_color` is the same as :attr:`divider_color` and is only there to make things more clear.
+
+	"""
+
 
 	_error_color = StringProperty('Red')
 	_error_weight = StringProperty('A700')
@@ -571,12 +590,6 @@ class ThemeManager(Widget):
 	:class:`kivy.properties.AliasProperty` and defaults to ``Red A700`` in rgb.
 	"""
 
-	def _get_btn_down_color(self):
-		hue = int(re.search(r'\d+', self.primary_hue).group())
-		return get_rgba_color([self.primary_palette, str(hue + 200)])
-
-	btn_down_color = AliasProperty(_get_btn_down_color, bind=('primary_palette', 'primary_hue', ))
-
 	def __init__(self, **kwargs):
 		super(ThemeManager, self).__init__(**kwargs)
 
@@ -597,35 +610,35 @@ class ThemeBehaviour(object):
 		and use the default settings.
 	"""
 
-	auto_color = BooleanProperty(True)
-	"""If True, the widget will automatically try to check the color of the background
-	in order to decide whether to use a dark or light text color.
-
-	The :attr:`auto_color` is a
-	:class:`kivy.properties.BooleanProperty` and defaults to ``True``.
-	"""
-
-	def _is_light(self):
-		if hasattr(self, 'has_background'):
-			if self.has_background:
-				return is_light_color(self.background_color)
-
-		parent = self
-		while True:
-			parent = parent.parent
-			if hasattr(parent, 'has_background'):
-				if parent.has_background and self.collide_widget(parent):
-					return is_light_color(parent.background_color)
-					break
-			if not hasattr(parent, 'parent'):
-				break
-
-		return True
-
-	has_light_background = AliasProperty(_is_light, bind=None)
-	"""Check if the widgets background color is light.
-
-	"""
+	# auto_color = BooleanProperty(True)
+	# """If True, the widget will automatically try to check the color of the background
+	# in order to decide whether to use a dark or light text color.
+	#
+	# The :attr:`auto_color` is a
+	# :class:`kivy.properties.BooleanProperty` and defaults to ``True``.
+	# """
+	#
+	# def _is_light(self):
+	# 	if hasattr(self, 'has_background'):
+	# 		if self.has_background:
+	# 			return is_light_color(self.background_color)
+	#
+	# 	parent = self
+	# 	while True:
+	# 		parent = parent.parent
+	# 		if hasattr(parent, 'has_background'):
+	# 			if parent.has_background and self.collide_widget(parent):
+	# 				return is_light_color(parent.background_color)
+	# 				break
+	# 		if not hasattr(parent, 'parent'):
+	# 			break
+	#
+	# 	return True
+	#
+	# has_light_background = AliasProperty(_is_light, bind=None)
+	# """Check if the widgets background color is light.
+	#
+	# """
 
 	_theme_cls = ObjectProperty()
 
