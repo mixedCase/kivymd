@@ -117,10 +117,13 @@ class SingleLineItemWithIcon(SingleLineItem, _ListItemWithImage):
 
 
 class SingleLineItemWithAvatar(SingleLineItemWithIcon, _ListItemWithImage):
-	height = dp(56)
 	text_top_padding = dp(20)
 	text_bottom_padding = dp(24)
 	_image_size = (dp(48), dp(48))
+
+	def __init__(self, **kwargs):
+		super(SingleLineItem, self).__init__(**kwargs)
+		self.height = dp(56)
 
 
 class TwoLineItem(_ListItem):
