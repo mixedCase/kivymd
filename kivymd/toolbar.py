@@ -42,8 +42,6 @@ class Toolbar(ThemeBehaviour, ElevationBehaviour, MaterialBoxLayout):
 	theme_style = OptionProperty(None, options=['Light', 'Dark'], allownone=True)
 
 	def __init__(self, **kwargs):
-		# self.elevation = elevation
-		# self.theme_style = theme_style
 		self._lbl_title = MaterialLabel(font_style='Subhead',
 										theme_text_color='Primary',
 										text=self.title,

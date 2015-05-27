@@ -175,14 +175,14 @@ class MaterialLabel(ThemeBehaviour, Label, BackgroundColorCapableWidget):
 			self.color = self._get_color(style)
 
 	def _get_color(self, style):
-		if self.theme_text_color == 'Primary':
-			return self._theme_cls.primary_text_color(style=style)
-		elif self.theme_text_color == 'Secondary':
-			return self._theme_cls.secondary_text_color(style=style)
-		elif self.theme_text_color == 'Hint':
-			return self._theme_cls.hint_text_color(style=style)
-		elif self.theme_text_color == 'Error':
-			return self._theme_cls.error_color
+			if self.theme_text_color == 'Primary':
+				return self._theme_cls.primary_text_color(style=style)
+			elif self.theme_text_color == 'Secondary':
+				return self._theme_cls.secondary_text_color(style=style)
+			elif self.theme_text_color == 'Hint':
+				return self._theme_cls.hint_text_color(style=style)
+			elif self.theme_text_color == 'Error':
+				return self._theme_cls.error_color
 
 	def _fix_size(self, widget, size):
 		self.text_size = size[0], None

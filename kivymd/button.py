@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from kivy.properties import StringProperty, NumericProperty, OptionProperty, ListProperty, BoundedNumericProperty
-from kivy.uix.behaviors import ButtonBehavior
+from kivy.uix.behaviors import ButtonBehavior, ToggleButtonBehavior
 from kivy.properties import AliasProperty
 from kivy.metrics import dp
 from layouts import MaterialFloatLayout, MaterialBoxLayout
@@ -204,6 +204,20 @@ class RaisedButton(ThemeBehaviour, RippleBehavior, ElevationBehaviour, ButtonBeh
 		self.label.size = self.size
 		self._update_bg_rectangle_size()
 		self._update_bg_rectangle_pos()
+
+
+	def on_text(self, instance, text):
+		self.label.text = text.upper()
+
+	def on_elevation_normal(self, instance, value):
+		self.elevation = value
+
+	def on_elevation_raised(self, instance, value):
+		if self.elevation_raised == 0 and self.elevation_normal + 6 <= 12:
+			self.elevation_raised = self.elevation_normal + 6
+		elif self.elevation_raised == 0:
+			self.elevation_raised = 12
+
 
 
 	def on_text(self, instance, text):

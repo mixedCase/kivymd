@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from kivy.uix.image import Image as Image
-from kivy.properties import StringProperty, BooleanProperty, ListProperty
+from kivy.properties import StringProperty, BooleanProperty, ListProperty, ObjectProperty, AliasProperty
 from kivy.metrics import dp
 from kivy.core.window import Window
 from kivy.uix.scrollview import ScrollView
@@ -13,7 +13,7 @@ from layouts import MaterialRelativeLayout, MaterialGridLayout, BackgroundColorC
 from label import MaterialLabel
 from button import MaterialButtonBlank
 from theme import ThemeBehaviour
-from material_resources import get_rgba_color
+from material_resources import get_rgba_color, get_icon_char
 
 class NavigationDrawer(ThemeBehaviour, SlidingPanel, BackgroundColorCapableWidget):
 	"""Implementation of the Navigation Drawer pattern."""
@@ -86,7 +86,7 @@ class NavigationDrawer(ThemeBehaviour, SlidingPanel, BackgroundColorCapableWidge
 		if type(widget) == NavigationDrawerCategory or \
 						type(widget) == NavigationDrawerButton:
 			self._bl_items.remove_widget(widget)
-			self._bl_items.add_widget(widget)
+			# self._bl_items.add_widget(widget)
 			widget.unbind(height=lambda x, y: self._refresh_list())
 		else:
 			super(NavigationDrawer, self).remove_widget(widget)
@@ -104,43 +104,41 @@ class NavigationDrawer(ThemeBehaviour, SlidingPanel, BackgroundColorCapableWidge
 
 
 class NavigationDrawerCategory(ThemeBehaviour, MaterialRelativeLayout, BackgroundColorCapableWidget):
-	name = StringProperty('Category')
+	name = StringProperty('')
+
 	divider = BooleanProperty(True)
 	subheader = BooleanProperty(True)
 
 	def __init__(self, **kwargs):
 		self._lbl_name = MaterialLabel(size_hint_y=None,
-									   text=self.name,
-									   x=dp(16),
-									   height=dp(48),
-									   font_style='Title')
-
-		self.bind(name=self._lbl_name.setter('text'))
+									   padding_x=dp(16),
+									   size=(0, 0),
+									   font_style='Title',
+									   valign='top',
+									   x=0)
+		self._lbl_name.bind(texture_size=self._fix_lbl)
 		self._bl_items = MaterialGridLayout(orientation="vertical",
 											size_hint_y=None,
 											height=0,
-											pos=(0, 0),
-											cols=1)
+											cols=1,
+											x=0)
 		self._divider = Divider()
 		super(NavigationDrawerCategory, self).__init__(**kwargs)
 		self.add_widget(self._lbl_name)
-
 		self.add_widget(self._bl_items)
 		self.add_widget(self._divider)
 
 		self.size_hint_y = None
 		self.height = self._lbl_name.height
 
+	def _fix_lbl(self, *args):
+		self._lbl_name.texture_update()
+		self._lbl_name.text_size = (self._lbl_name.width, None)
+		self._lbl_name.height = self._lbl_name.texture_size[1] + dp(50)
+		self._refresh_list()
+
 	def on_name(self, instance, value):
 		self._lbl_name.text = value
-
-	def on_subheader(self, instance, value):
-		if value:
-			self._lbl_name.height = dp(48)
-			self._lbl_name.opacity = 100
-		else:
-			self._lbl_name.height = dp(0)
-			self._lbl_name.opacity = 0
 
 	def on_divider(self, instance, value):
 		if value:
@@ -171,8 +169,37 @@ class NavigationDrawerCategory(ThemeBehaviour, MaterialRelativeLayout, Backgroun
 		self.height = self._lbl_name.height + item_list_height
 
 
+
 class NavigationDrawerButton(ThemeBehaviour, MaterialButtonBlank, BackgroundColorCapableWidget):
 	text = StringProperty()
+
+	_icon = ObjectProperty(None)
+	def _get_icon(self):
+		if self._icon:
+			return self._icon
+		else:
+			self._icon = Image(size_hint=(None, None),
+							   size=(dp(24), dp(24)),
+							   pos=(dp(16), dp(12)),
+							   mipmap=True,
+							   source=m_res.ICON_DEFAULT)
+			return self._icon
+
+	def _set_icon(self, icon):
+		if icon[:2] == 'md':
+			self._icon = MaterialLabel(icon=icon,
+									   font_style='Icon',
+									   size_hint=(None, None),
+									   size=(dp(24), dp(24)),
+									   pos=(dp(16), dp(12)))
+		else:
+			self._icon = Image(size_hint=(None, None),
+							   size=(dp(24), dp(24)),
+							   pos=(dp(16), dp(12)),
+							   mipmap=True,
+							   source=m_res.ICON_DEFAULT)
+
+	icon = AliasProperty(_get_icon, _set_icon, bind=('_icon',))
 
 	_background_color_down = ListProperty([])
 	_tmp_color = ListProperty([])
@@ -187,13 +214,8 @@ class NavigationDrawerButton(ThemeBehaviour, MaterialButtonBlank, BackgroundColo
 													 control_alpha=.4)
 		self.height = m_res.TOUCH_TARGET_HEIGHT
 
-		self._icon = Image(size_hint=(None, None),
-						   size=(dp(24), dp(24)),
-						   pos=(dp(16), dp(12)),
-						   mipmap=True,
-						   source=m_res.ICON_DEFAULT)
 		self.add_widget(self._lbl)
-		self.add_widget(self._icon)
+		self.add_widget(self.icon)
 
 	def on_text(self, instance, value):
 		self._lbl.text = value
