@@ -16,7 +16,7 @@ from kivymd.navigationdrawer import NavigationDrawer, NavigationDrawerButton, \
 class MainWidget(MaterialRelativeLayout):
 
 	def __init__(self, **kwargs):
-		self.toolbar = Toolbar(title="KivyMD Kitchen Sink App")
+		self.toolbar = Toolbar(title="KivyMD")
 		self.nav = NavigationDrawer(
 			side="left",
 			header_img=kivymd.images_path + "PLACEHOLDER_BG.jpg",
@@ -25,12 +25,10 @@ class MainWidget(MaterialRelativeLayout):
 
 		self.background_color = (1,1,1,1)
 
-		self.toolbar.nav_button = ["", lambda: self.nav.toggle()]
-		self.toolbar.add_action_button("")
-		self.toolbar.add_action_button("")
-		self.toolbar.add_action_button("")
+		self.toolbar.nav_button = ["md-menu", lambda: self.nav.toggle()]
+		self.toolbar.add_action_button("md-insert-photo")
 		self.toolbar.add_action_button(
-			"",
+			"md-security",
 			action=lambda x: self.open_bottom_sheet())
 
 		self.cat1 = NavigationDrawerCategory(subheader=False)
@@ -50,10 +48,16 @@ class MainWidget(MaterialRelativeLayout):
 		self.add_widget(self.nav)
 
 	def open_bottom_sheet(self):
-		bottom_sheet = BottomSheet()
-		for i in range(0, 30):
-			bottom_sheet.add_item(SingleLineItem(text="Test", divider=False))
-		bottom_sheet.open()
+		self.bottom_sheet = BottomSheet()
+		for i in range(0, 40):
+			self.bottom_sheet.add_item(SingleLineItem(
+				text="Test",
+				divider=False,
+				on_touch_down=lambda x, y: self.close_bottom_sheet()))
+		self.bottom_sheet.open()
+
+	def close_bottom_sheet(self):
+		self.bottom_sheet.dismiss()
 
 	def on_width(self, instance, value):
 		self.toolbar.width = value

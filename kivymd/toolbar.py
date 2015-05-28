@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
+from kivy.app import App
 from kivy.properties import StringProperty, ListProperty
 from kivy.uix.boxlayout import BoxLayout as _BoxLayout
 from kivy.metrics import dp
 
 from kivymd import material_resources as m_res
-from layouts import MaterialRelativeLayout
-from label import MaterialLabel
-from button import MaterialIcon
+from kivymd.layouts import MaterialRelativeLayout
+from kivymd.label import MaterialLabel
+from kivymd.button import MaterialIcon
+from kivymd.theme import ThemeBehavior
 
 
-class Toolbar(MaterialRelativeLayout):
+class Toolbar(ThemeBehavior, MaterialRelativeLayout):
 	"""A toolbar as found on many Material Design/Android apps
 
 	.. warning::
@@ -35,9 +37,10 @@ class Toolbar(MaterialRelativeLayout):
 	"""
 
 	def __init__(self, **kwargs):
-		self._lbl_title = MaterialLabel(style="bold",
+		self._lbl_title = MaterialLabel(font_style="Body2",
+		                                theme_style="Dark",
 		                                text=self.title,
-		                                pos=(dp(24),0))
+		                                pos=(dp(72),0))
 		super(Toolbar, self).__init__(**kwargs)
 		self.size_hint_y = None
 		self.height = dp(48)
@@ -45,8 +48,9 @@ class Toolbar(MaterialRelativeLayout):
 		self.background_color = (0, 0.5882352941176471, 0.5333333333333333, 1)
 
 		self._nav_button = MaterialIcon(size_hint_x=None,
+		                                theme_style="Dark",
 		                                size=(0,dp(48)),
-		                                pos=(dp(12),0))
+		                                pos=(dp(4),0))
 
 		self._bl_action_buttons = _BoxLayout(size_hint_x=None, width=0)
 		self._action_buttons = []
@@ -56,8 +60,20 @@ class Toolbar(MaterialRelativeLayout):
 		self.add_widget(self._bl_action_buttons)
 
 		self.bind(width=lambda x, y: self._refresh_action_buttons())
+		if hasattr(App.get_running_app(), 'theme_cls'):
+			App.get_running_app().theme_cls.bind(
+				device_orientation=self.adjust_orientation)
 		self.nav_button = ['', None]  # Setting a default in the ListProperty
 		# somehow makes it bug, so we set it at the end of __init__
+
+	def adjust_orientation(self, instance, orientation):
+		if m_res.DEVICE_TYPE == "mobile":
+			if orientation == "landscape":
+				self.height = m_res.STANDARD_INCREMENT - dp(8)
+			elif orientation == "portrait":
+				self.height = m_res.STANDARD_INCREMENT
+		else:
+			self.height = m_res.STANDARD_INCREMENT
 
 	def on_nav_button(self, instance, value):
 		self._nav_button.icon = value[0]
@@ -80,7 +96,7 @@ class Toolbar(MaterialRelativeLayout):
 		:param action: Function set to trigger when on_release fires
 		:type action: function or None
 		"""
-		button = MaterialIcon(size=(dp(48),dp(48)))
+		button = MaterialIcon(theme_style="Dark", size=(dp(48),dp(48)))
 		button.icon = icon
 		if action:
 			button.bind(on_release=action)

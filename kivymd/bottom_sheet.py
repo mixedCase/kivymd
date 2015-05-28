@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import time
 from kivy.core.window import Window
 from kivy.metrics import dp
 from kivy.properties import StringProperty
@@ -73,5 +74,5 @@ class BottomSheet(ExpandableSlidingModal):
 
 	def on_touch_up(self, touch):
 		if self._touch and not self._moved:
-			return super(BottomSheet, self).on_touch_down(touch)
+			return super(BottomSheet, self).on_touch_up(touch)
 		return super(BottomSheet, self).on_touch_up(touch)

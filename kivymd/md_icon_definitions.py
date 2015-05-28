@@ -1,3 +1,6 @@
+# Gallery available here:
+# https://zavoloklom.github.io/material-design-iconic-font/icons.html#toggle
+
 md_icons = {
 	'md-3d-rotation':
 		u"\uf000",

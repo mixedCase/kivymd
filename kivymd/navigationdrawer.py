@@ -175,8 +175,8 @@ class NavigationDrawerButton(MaterialButtonBlank):
 	text = StringProperty()
 
 	def __init__(self, **kwargs):
-		self.ripple_color = \
-			m_res.get_palette_with_alpha(m_res.PALETTE_GREY)["400"]
+		#self.ripple_color = \
+		#	m_res.get_palette_with_alpha(m_res.PALETTE_GREY)["400"]
 		self._lbl = MaterialLabel(x=self.x + dp(72),
 		                          color=(0,0,0,1),
 		                          style="medium")

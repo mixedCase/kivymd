@@ -1,20 +1,24 @@
 # -*- coding: utf-8 -*-
+from kivy.app import App
 from kivy.properties import ListProperty, NumericProperty, StringProperty
 from kivy.animation import Animation
 from kivy.graphics import Color, Ellipse, StencilPush, StencilPop, StencilUse,\
 	StencilUnUse, Rectangle
 
-from kivymd import material_resources as m_res
-
-
-# Special thanks to github.com/Kovak/ for his work on FlatKivy, which provided
-# the basis for this class.
 
 class RippleBehavior(object):
+	# 	""":class:`RippleBehaviour` provides a ripple effect much like the one seen in the
+	# 	Material Design by Google. The color of the ripple is by default the same as
+	# 	:class:`ThemeManager.accent_color`. Look at the documentation on :class:`ThemeManager`
+	# 	for information on how to change it.
+	#
+	# 	.. note:
+	# 		Special thanks to github.com/Kovak/ for his work on FlatKivy, which provided
+	# 		the basis for this class.
+	# 	"""
 	ripple_rad = NumericProperty(10)
 	ripple_pos = ListProperty([0, 0])
-	ripple_color = ListProperty(
-		m_res.get_palette_with_alpha(m_res.PALETTE_GREY)['400'])
+	ripple_color = ListProperty()
 	ripple_duration_in = NumericProperty(.3)
 	ripple_duration_out = NumericProperty(.5)
 	ripple_fade_to_alpha = NumericProperty(.7)
@@ -28,8 +32,14 @@ class RippleBehavior(object):
 			self.ripple_pos = ripple_pos = (touch.x, touch.y)
 			Animation.cancel_all(self, 'ripple_rad', 'ripple_color',
 			                     'rect_color')
-			rc = self.ripple_color
+			if hasattr(App.get_running_app(), 'theme_cls'):
+				self.ripple_color = \
+					App.get_running_app().theme_cls.ripple_color
+			elif self.ripple_color == []:
+				raise ValueError("You must set ripple_color if you're not"
+				                 " using a ThemeManager")
 			ripple_rad = self.ripple_rad
+			rc = self.ripple_color
 			self.ripple_color = [rc[0], rc[1], rc[2], .9]
 			anim = Animation(
 				ripple_rad=max(self.width, self.height) * self.ripple_scale,
@@ -64,14 +74,17 @@ class RippleBehavior(object):
 		self.col_instruction.rgba = value
 
 	def on_touch_up(self, touch):
-		if self.collide_point(*touch.pos):
-			rc = self.ripple_color
-			anim = Animation(
-				ripple_color=[rc[0], rc[1], rc[2], 0.],
-				t=self.ripple_func_out, duration=self.ripple_duration_out)
-			anim.bind(on_complete=self.anim_complete)
-			anim.start(self)
+		if self.state == "down":
+			self.finish_ripple()
 		return super(RippleBehavior, self).on_touch_up(touch)
+
+	def finish_ripple(self):
+		rc = self.ripple_color
+		anim = Animation(
+			ripple_color=[rc[0], rc[1], rc[2], 0.],
+			t=self.ripple_func_out, duration=self.ripple_duration_out)
+		anim.bind(on_complete=self.anim_complete)
+		anim.start(self)
 
 	def anim_complete(self, anim, instance):
 		self.ripple_rad = 10
