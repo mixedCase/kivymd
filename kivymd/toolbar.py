@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-from kivy.app import App
-from kivy.properties import StringProperty, ListProperty, OptionProperty, NumericProperty
-from kivy.uix.boxlayout import BoxLayout as _BoxLayout
+
+from kivy.lang import Builder
+from kivy.properties import StringProperty, ListProperty, OptionProperty, ObjectProperty
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.metrics import dp
 from kivy.clock import Clock
@@ -9,12 +10,66 @@ from kivy.clock import Clock
 from kivymd import material_resources as m_res
 from layouts import MaterialBoxLayout
 from label import MaterialLabel
-from button import MaterialIcon
+from button import MaterialIconButton
 from theme import ThemeBehaviour
 from elevationbehaviour import ElevationBehaviour
 
 
-class Toolbar(ThemeBehaviour, ElevationBehaviour, MaterialBoxLayout):
+toolbar_kv = '''
+<Toolbar>:
+	canvas.before:
+		Color:
+			rgba: self.background_color
+		Rectangle:
+			size: self.size
+			pos: self.pos
+
+	_nav_button: 		nav_button
+	_lbl_title: 		title_label
+	_bl_action_buttons:	bl_action_buttons
+
+	size_hint_y:	None
+	height:			dp(56)
+	padding:		dp(8), 0
+	spacing:		dp(8)
+
+	AnchorLayout:
+		anchor_x:	'center'
+		anchor_y:	'center'
+		size_hint:	None, 1
+		width:		dp(48) if root.nav_button else 0
+		MaterialIconButton:
+			id:				nav_button
+			size_hint:		None, None
+			size:			0, 0
+			theme_style:	root.icons_theme_style
+
+	MaterialLabel:
+		id: 				title_label
+		font_style:			'Subhead'
+		theme_text_color:	'Primary'
+		theme_style:		root.title_theme_style
+		text:				root.title
+		padding:			0, dp(20)
+		halign:				'left'
+		valign:				'middle'
+		size_hint_x:		None
+		width:				self.texture_size[0]
+		text_size:			None, self.height
+
+	AnchorLayout:
+		anchor_x:	'right'
+		anchor_y:	'center'
+		GridLayout:
+			id:				bl_action_buttons
+			rows:			1
+			width:			self.minimum_width
+			size_hint:		None, None
+			height:			dp(48)
+'''
+Builder.load_string(toolbar_kv)
+
+class Toolbar(ThemeBehaviour, ElevationBehaviour, BoxLayout):
 	"""A toolbar as found on many Material Design/Android apps
 
 	.. warning::
@@ -29,7 +84,7 @@ class Toolbar(ThemeBehaviour, ElevationBehaviour, MaterialBoxLayout):
 		"My application"
 	"""
 
-	nav_button = ListProperty()
+	nav_button = ListProperty(None, allownone=True)
 	"""Button left of the title, value must be a list with icon char and
 	 callback
 
@@ -39,54 +94,24 @@ class Toolbar(ThemeBehaviour, ElevationBehaviour, MaterialBoxLayout):
 		("md-view-headline", self.my_callback_method)
 	"""
 
-	theme_style = OptionProperty(None, options=['Light', 'Dark'], allownone=True)
+	title_theme_style = OptionProperty(None, options=['Light', 'Dark'], allownone=True)
 
+	icons_theme_style = OptionProperty(None, options=['Light', 'Dark'], allownone=True)
+
+	_lbl_title = ObjectProperty()
+	_nav_button = ObjectProperty()
+	_action_buttons = ListProperty([])
+	_bl_action_buttons = ObjectProperty()
 	def __init__(self, **kwargs):
-		self._lbl_title = MaterialLabel(font_style='Subhead',
-										theme_text_color='Primary',
-										text=self.title,
-										pos=(dp(24), 0),
-										halign='left',
-										valign='middle',
-										size_hint=(None, 1))
-
 		super(Toolbar, self).__init__(**kwargs)
-		# self._lbl_title.bind(width=self._refresh_action_buttons)
-		self._lbl_title.theme_style = self.theme_style if self.theme_style else self._theme_cls.theme_style
-
-		self.size_hint_y = None
-		self.height = dp(48)
-		self.spacing = dp(1)
 		self.background_color = self._theme_cls.primary_color
-
-		self._nav_button = MaterialIcon(size_hint=(None, None),
-										size=(0, dp(48)),
-										pos=(dp(12), 0),
-										font_style='Icon',
-										theme_style=self.theme_style if self.theme_style else self._theme_cls.theme_style)
-		self._nav_button.bind(theme_style=self.setter('theme_style'))
-		self._bl_container = AnchorLayout(anchor_x='right')
-		self._bl_action_buttons = _BoxLayout(size_hint_x=None, width=0)
-		self._bl_container.add_widget(self._bl_action_buttons)
-		self._action_buttons = []
-
-		self.add_widget(self._nav_button)
-		self.add_widget(self._lbl_title)
-		self.add_widget(self._bl_container)
-
-		self.bind(width=self._refresh_action_buttons)
-		self.nav_button = ['', None]  # Setting a default in the ListProperty
-
-	# somehow makes it bug, so we set it at the end of __init__
 
 	def on_nav_button(self, instance, value):
 		if value[0] == '':
-			self._nav_button.width = 0
-			self._lbl_title.x = dp(24)
+			self._nav_button.size = (0, 0)
 		else:
 			self._nav_button.icon = value[0]
-			self._nav_button.width = dp(48)
-			self._lbl_title.x = dp(72)
+			self._nav_button.size = (dp(48), dp(48))
 		if value[1] == None:
 			self._nav_button.unbind(on_release=self._nav_button.on_release)
 		else:
@@ -100,19 +125,13 @@ class Toolbar(ThemeBehaviour, ElevationBehaviour, MaterialBoxLayout):
 		:param action: Function set to trigger when on_release fires
 		:type action: function or None
 		"""
-		button = MaterialIcon(size_hint=(None, None),
-							  size=(dp(48), dp(48)),
-							  icon=icon,
-							  theme_style=self.theme_style if self.theme_style else self._theme_cls.theme_style)
-		button.bind(theme_style=self.setter('theme_style'))
+		button = MaterialIconButton(size_hint=(None, None),
+									size=(dp(48), dp(48)),
+									icon=icon)
 		if action:
 			button.bind(on_release=action)
-		#
-		# self._bl_action_buttons.width += dp(48)
-		# self._bl_action_buttons.x -= dp(48)
-		# self._bl_action_buttons.add_widget(button)
+		button.theme_style = self.icons_theme_style
 		self._action_buttons.append(button)
-		self._refresh_action_buttons()
 
 	def get_action_buttons(self):
 		"""Returns all action buttons on the toolbar."""
@@ -122,29 +141,16 @@ class Toolbar(ThemeBehaviour, ElevationBehaviour, MaterialBoxLayout):
 		"""Deletes from the toolbar the provided action button.
 
 		:param button_widget: The action button instance.
-		:type button_widget: MaterialIcon
+		:type button_widget: MaterialIconButton
 		"""
 		self._bl_action_buttons.remove_widget(button_widget)
 		self._action_buttons.remove(button_widget)
-		self._refresh_action_buttons()
 
 	def clear_action_buttons(self):
 		self._bl_action_buttons.clear_widgets()
 		self._action_buttons = []
-		self._refresh_action_buttons()
 
-	def _refresh_action_buttons(self, *args):
-		# self._bl_container.width = self.width - self._nav_button.width - self._lbl_title.width
+	def on__action_buttons(self, *args):
 		self._bl_action_buttons.clear_widgets()
-		self._bl_action_buttons.width = 0
-		self._bl_action_buttons.x = self.width - dp(4)
-
 		for i in self._action_buttons:
-			self._bl_action_buttons.width += m_res.TOUCH_TARGET_HEIGHT
-			self._bl_action_buttons.x -= m_res.TOUCH_TARGET_HEIGHT
 			self._bl_action_buttons.add_widget(i)
-		self._lbl_title.width = self.width - self._nav_button.width - self._bl_action_buttons.width
-
-	def on_title(self, instance, value):
-		self._lbl_title.text = value
-		self._lbl_title.texture_update()

@@ -6,8 +6,9 @@ from kivy.app import App
 from kivy.core.text import LabelBase
 from kivy.uix.widget import Widget
 from kivy.properties import (StringProperty, OptionProperty, AliasProperty,
-							 ObjectProperty, BooleanProperty)
-from kivymd.material_resources import get_rgba_color, FONTS, is_light_color
+							 ObjectProperty, ReferenceListProperty, ListProperty)
+from kivy.core.window import Window
+from kivymd.material_resources import get_rgba_color, FONTS, get_color_tuple
 
 
 class ThemeManager(Widget):
@@ -590,9 +591,21 @@ class ThemeManager(Widget):
 	:class:`kivy.properties.AliasProperty` and defaults to ``Red A700`` in rgb.
 	"""
 
+	_win_size = ListProperty([0, 0])
+	def _get_window_size(self):
+		return self._win_size
+
+	def _set_window_size(self, size):
+		self._win_size[0] = size[0]
+		self._win_size[1] = size[1]
+
+	window_size = AliasProperty(_get_window_size, _set_window_size, bind=('_win_size',))
+
 	def __init__(self, **kwargs):
 		super(ThemeManager, self).__init__(**kwargs)
-
+		self._win_size = Window.size
+		Window.bind(on_resize=lambda *x: setattr(self, '_win_size', Window.size),
+					on_rotate=lambda *x: setattr(self, '_win_size', Window.size))
 		for font in FONTS:
 			LabelBase.register(**font)
 
@@ -610,35 +623,45 @@ class ThemeBehaviour(object):
 		and use the default settings.
 	"""
 
-	# auto_color = BooleanProperty(True)
-	# """If True, the widget will automatically try to check the color of the background
-	# in order to decide whether to use a dark or light text color.
-	#
-	# The :attr:`auto_color` is a
-	# :class:`kivy.properties.BooleanProperty` and defaults to ``True``.
-	# """
-	#
-	# def _is_light(self):
-	# 	if hasattr(self, 'has_background'):
-	# 		if self.has_background:
-	# 			return is_light_color(self.background_color)
-	#
-	# 	parent = self
-	# 	while True:
-	# 		parent = parent.parent
-	# 		if hasattr(parent, 'has_background'):
-	# 			if parent.has_background and self.collide_widget(parent):
-	# 				return is_light_color(parent.background_color)
-	# 				break
-	# 		if not hasattr(parent, 'parent'):
-	# 			break
-	#
-	# 	return True
-	#
-	# has_light_background = AliasProperty(_is_light, bind=None)
-	# """Check if the widgets background color is light.
-	#
-	# """
+	_bg_color = ListProperty([1, 1, 1, 0])
+	def _get_background_color(self):
+		return self._bg_color
+
+	def _set_background_color(self, color, alpha=None):
+		if len(color) == 2:
+			self._bg_color = get_rgba_color(color, control_alpha=alpha)
+		elif len(color) == 4:
+			self._bg_color = color
+
+	def _get_bg_color_tuple(self):
+		return get_color_tuple(self._bg_color)
+
+	background_color = AliasProperty(_get_background_color, _set_background_color, bind=('_bg_color', ))
+	background_color_tuple = AliasProperty(_get_bg_color_tuple, bind=('_bg_color', ))
+
+	_rip_color = ListProperty(None, allownone=True)
+	def _get_rip_color(self):
+		if self._rip_color:
+			return self._rip_color
+		else:
+			return self._theme_cls.ripple_color
+
+	def _set_rip_color(self, color, alpha=None):
+		if len(color) == 2:
+			self._rip_color = get_rgba_color(color, control_alpha=alpha)
+		elif len(color) == 4:
+			self._rip_color = color
+
+	ripple_color = AliasProperty(_get_rip_color, _set_rip_color, bind=('_rip_color', ))
+
+
+	def _has_background(self):
+		if self._bg_color[3] > 0:
+			return True
+		else:
+			return False
+
+	has_background = AliasProperty(_has_background, bind=('_bg_color', ))
 
 	_theme_cls = ObjectProperty()
 
@@ -648,3 +671,4 @@ class ThemeBehaviour(object):
 		else:
 			self._theme_cls = ThemeManager()
 		super(ThemeBehaviour, self).__init__(**kwargs)
+		self._rip_color = self._theme_cls.ripple_color

@@ -1,16 +1,34 @@
 # -*- coding: utf-8 -*-
 
-from kivy.app import App
+from kivy.lang import Builder
 from kivy.uix.label import Label
-from kivy.properties import DictProperty, BooleanProperty, OptionProperty, StringProperty, ListProperty
-from kivy.metrics import sp, dp
-from kivy.graphics import Color, Rectangle
-from kivy.clock import Clock
+from kivy.properties import DictProperty, OptionProperty, StringProperty, ListProperty
+from kivy.metrics import sp
 from material_resources import get_icon_char, get_rgba_color
-from layouts import BackgroundColorCapableWidget
 from theme import ThemeBehaviour
 
-class MaterialLabel(ThemeBehaviour, Label, BackgroundColorCapableWidget):
+
+materiallbl_kv = '''
+<MaterialLabel>:
+	canvas.before:
+		Color:
+			rgba: self.background_color
+		Rectangle:
+			size: self.size
+			pos: self.pos
+	canvas:
+		Clear
+		Color:
+			rgba: self.color if not self.disabled else self._theme_cls.disabled_text_color()
+		Rectangle:
+			texture: self.texture
+            size: self.texture_size
+            pos: int(self.center_x - self.texture_size[0] / 2.), int(self.center_y - self.texture_size[1] / 2.)
+
+'''
+
+
+class MaterialLabel(ThemeBehaviour, Label):
 	""":class:`MaterialLabel(**kwargs)` uses by default the Roboto font. With 
 	:attr:`font_style` and :attr:`theme_style` you can choose from some pre-defined
 	styles that's described in the Material Design guide lines.
@@ -128,14 +146,12 @@ class MaterialLabel(ThemeBehaviour, Label, BackgroundColorCapableWidget):
 								 'Icon':['Icons', False, 24]})
 
 	def __init__(self, **kwargs):
+		Builder.load_string(materiallbl_kv)
 		super(MaterialLabel, self).__init__(**kwargs)
-		self.text_size = self.size
 		self.bind(theme_text_color=self._update_color,
 				  theme_style=self._update_color,
-				  text_color=self._update_color,
-				  size=self._fix_size)
-		self.disabled_color = self._theme_cls.disabled_text_color()
-		Clock.schedule_once(self._update_color, 0)
+				  text_color=self._update_color)
+		self.theme_style = self._theme_cls.theme_style
 
 	def on_font_style(self, instance, style):
 		self.font_style = style
@@ -175,19 +191,11 @@ class MaterialLabel(ThemeBehaviour, Label, BackgroundColorCapableWidget):
 			self.color = self._get_color(style)
 
 	def _get_color(self, style):
-			if self.theme_text_color == 'Primary':
-				return self._theme_cls.primary_text_color(style=style)
-			elif self.theme_text_color == 'Secondary':
-				return self._theme_cls.secondary_text_color(style=style)
-			elif self.theme_text_color == 'Hint':
-				return self._theme_cls.hint_text_color(style=style)
-			elif self.theme_text_color == 'Error':
-				return self._theme_cls.error_color
-
-	def _fix_size(self, widget, size):
-		self.text_size = size[0], None
-		self.texture_update()
-		if self.size_hint_y == None and self.size_hint_x != None:
-			self.height = max(self.texture_size[1], self.line_height)
-		elif self.size_hint_x == None and self.size_hint_y != None:
-			self.width = self.texture_size[0]
+		if self.theme_text_color == 'Primary':
+			return self._theme_cls.primary_text_color(style=style)
+		elif self.theme_text_color == 'Secondary':
+			return self._theme_cls.secondary_text_color(style=style)
+		elif self.theme_text_color == 'Hint':
+			return self._theme_cls.hint_text_color(style=style)
+		elif self.theme_text_color == 'Error':
+			return self._theme_cls.error_color
