@@ -19,7 +19,7 @@ shadow_kv = '''
 
 '''
 class Shadow(ButtonBehavior, FloatLayout):
-	start_visible = BooleanProperty(True)
+	start_visible = BooleanProperty(False)
 
 	opacity = BoundedNumericProperty(1.0, min=0.0, max=1.0)
 

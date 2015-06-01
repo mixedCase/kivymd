@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from kivy.app import App
+
 from kivy.metrics import dp
-from kivy.properties import ObjectProperty, AliasProperty, ListProperty
+from kivy.properties import AliasProperty
 
 from kivymd.layouts import MaterialRelativeLayout
 from theme import ThemeBehaviour

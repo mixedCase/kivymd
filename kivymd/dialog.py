@@ -1,16 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from kivy.lang import Builder
-from kivy.properties import StringProperty, ObjectProperty, NumericProperty, BooleanProperty, ListProperty
+from kivy.properties import StringProperty, ObjectProperty, ListProperty
 from kivy.metrics import dp
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.gridlayout import GridLayout
 from kivy.uix.modalview import ModalView
-from kivy.uix.popup import Popup
 from kivymd.button import FlatButton
 from kivymd.shadow import Shadow
 from kivy.animation import Animation
-from kivy.clock import Clock
 from theme import ThemeBehaviour
 from elevationbehaviour import ElevationBehaviour
 
@@ -27,21 +23,23 @@ dialog_kv = '''
 	_action_area:	action_area
 	GridLayout:
 		cols:			1
-		padding:		dp(24), dp(24), dp(24), 0
-		spacing:		dp(20)
 
-		MaterialLabel:
-			text:				root.title
-			font_style:			'Title'
-			theme_text_color:	'Primary'
-			halign:				'left'
-			valign:				'middle'
-			size_hint_y:		None
-			text_size:			self.width, None
-			height:				self.texture_size[1]
+		GridLayout:
+			cols: 1
+			padding:		dp(24), dp(24), dp(24), 0
+			spacing:		dp(20)
+			MaterialLabel:
+				text:				root.title
+				font_style:			'Title'
+				theme_text_color:	'Primary'
+				halign:				'left'
+				valign:				'middle'
+				size_hint_y:		None
+				text_size:			self.width, None
+				height:				self.texture_size[1]
 
-		BoxLayout:
-			id:					container
+			BoxLayout:
+				id:					container
 
 		AnchorLayout:
 			anchor_x:			'right'
@@ -54,11 +52,12 @@ dialog_kv = '''
 			GridLayout:
 				id:				action_area
 				rows:			1
-				size_hint_x:	None
+				size_hint:		None, None if len(root._action_buttons) > 0 else 1
+				height:			dp(36) if len(root._action_buttons) > 0 else 0
 				width:			self.minimum_width
 '''
 
-
+Builder.load_string(dialog_kv)
 
 class Dialog(ThemeBehaviour, ElevationBehaviour, ModalView):
 
@@ -71,10 +70,11 @@ class Dialog(ThemeBehaviour, ElevationBehaviour, ModalView):
 	_action_area = ObjectProperty()
 
 	def __init__(self, **kwargs):
-		Builder.load_string(dialog_kv)
 		super(Dialog, self).__init__(**kwargs)
 		self.elevation = 12
-
+		self.shadow = Shadow(opacity=0.5)
+		self.bind(_action_buttons=self._update_action_buttons,
+				  auto_dismiss=lambda *x: setattr(self.shadow, 'on_release', self.shadow.dismiss if self.auto_dismiss else None))
 
 	def add_action_button(self, text, action=None):
 		"""Add an :class:`FlatButton` to the right of the action area.
@@ -85,12 +85,12 @@ class Dialog(ThemeBehaviour, ElevationBehaviour, ModalView):
 		:type action: function or None
 		"""
 		button = FlatButton(text=text,
-							size_hint=(1, None),
-							height=dp(36),
-							text_color=self._theme_cls.primary_color,
-							background_color=self._theme_cls.dialog_background_color)
+							size_hint=(None, None),
+							height=dp(36))
 		if action:
 			button.bind(on_release=action)
+		button.text_color = self._theme_cls.primary_color
+		button.background_color = self._theme_cls.dialog_background_color
 		self._action_buttons.append(button)
 
 	def add_widget(self, widget):
@@ -101,6 +101,60 @@ class Dialog(ThemeBehaviour, ElevationBehaviour, ModalView):
 			self.content = widget
 		else:
 			super(Dialog, self).add_widget(widget)
+
+	def open(self, *largs):
+		'''Show the view window from the :attr:`attach_to` widget. If set, it
+		will attach to the nearest window. If the widget is not attached to any
+		window, the view will attach to the global
+		:class:`~kivy.core.window.Window`.
+		'''
+		if self._window is not None:
+			Logger.warning('ModalView: you can only open once.')
+			return self
+		# search window
+		self._window = self._search_window()
+		if not self._window:
+			Logger.warning('ModalView: cannot open view, no window found.')
+			return self
+		self.shadow.fade_in(duration=.2, add_to=self._window)
+		self._window.add_widget(self)
+		self._window.bind(
+			on_resize=self._align_center,
+			on_keyboard=self._handle_keyboard)
+		self.center = self._window.center
+		self.bind(size=self._update_center)
+		a = Animation(_anim_alpha=1., d=self._anim_duration)
+		a.bind(on_complete=lambda *x: self.dispatch('on_open'))
+		a.start(self)
+		return self
+
+	def dismiss(self, *largs, **kwargs):
+		'''Close the view if it is open. If you really want to close the
+		view, whatever the on_dismiss event returns, you can use the *force*
+		argument:
+		::
+
+			view = ModalView(...)
+			view.dismiss(force=True)
+
+		When the view is dismissed, it will be faded out before being
+		removed from the parent. If you don't want animation, use::
+
+			view.dismiss(animation=False)
+
+		'''
+		if self._window is None:
+			return self
+		if self.dispatch('on_dismiss') is True:
+			if kwargs.get('force', False) is not True:
+				return self
+		self.shadow.fade_out(duration=.2)
+		if kwargs.get('animation', True):
+			Animation(_anim_alpha=0., d=self._anim_duration).start(self)
+		else:
+			self._anim_alpha = 0
+			self._real_remove_widget()
+		return self
 
 	def on_content(self, instance, value):
 		if self._container:
@@ -118,7 +172,9 @@ class Dialog(ThemeBehaviour, ElevationBehaviour, ModalView):
 			return True
 		return super(Dialog, self).on_touch_down(touch)
 
-	def on__action_buttons(self, *args):
+	def _update_action_buttons(self, *args):
 		self._action_area.clear_widgets()
 		for btn in self._action_buttons:
+			btn._label.texture_update()
+			btn.width = btn._label.texture_size[0] + dp(16)
 			self._action_area.add_widget(btn)

@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
 
 from kivy.lang import Builder
-from kivy.properties import (StringProperty, NumericProperty, OptionProperty,
+from kivy.properties import (StringProperty, OptionProperty,
 							 ListProperty, BoundedNumericProperty, ObjectProperty)
-from kivy.uix.behaviors import ButtonBehavior, ToggleButtonBehavior
+from kivy.uix.behaviors import ButtonBehavior
 from kivy.properties import AliasProperty
-from kivy.metrics import dp
-from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.anchorlayout import AnchorLayout
-from layouts import MaterialFloatLayout, MaterialBoxLayout
 from kivymd.label import MaterialLabel
 from ripplebehavior import RippleBehavior, CircularRippleBehavior
 from elevationbehaviour import ElevationBehaviour
 from kivy.animation import Animation
-from material_resources import get_rgba_color, get_btn_down_color
+from material_resources import get_rgba_color
 
 from theme import ThemeBehaviour
 
@@ -67,7 +65,7 @@ class MaterialIconButton(CircularRippleBehavior, ButtonBehavior, MaterialLabel):
 		super(MaterialIconButton, self).__init__(**kwargs)
 
 
-class MaterialButtonBlank(RippleBehavior, ButtonBehavior, MaterialFloatLayout):
+class MaterialButtonBlank(RippleBehavior, ButtonBehavior, FloatLayout):
 	pass
 
 flatbutton_kv = '''
@@ -80,25 +78,58 @@ flatbutton_kv = '''
 			size: self.size
 			pos: self.pos
 
+	_label:				label
+	anchor_x:			'center'
+	anchor_y:			'center'
+
 	MaterialLabel:
+		id:				label
 		font_style: 	'Button'
 		text:			root._text
-		size_hint:		1, None
-		text_size:		self.width, None
-		height:			self.texture_size[1]
-		theme_style:	root.theme_style
-		text_color:		root.text_color
+		size_hint:		None, None
+		text_size:	 	None, None
+		size:			self.texture_size
+		theme_style:	'Custom'
+		text_color:		root.text_color if root.state == 'normal' else root.text_color_down
 		disabled:		root.disabled
+		halign: 		'center'
+		valign: 		'middle'
 
 '''
 Builder.load_string(flatbutton_kv)
-class FlatButton(ThemeBehaviour, RippleBehavior, ButtonBehavior, BoxLayout):
+class FlatButton(ThemeBehaviour, RippleBehavior, ButtonBehavior, AnchorLayout):
 
 	text = StringProperty('')
 
-	text_color = ListProperty(None, allownone=True)
+	text_color = ListProperty()
+
+	text_color_down = ListProperty()
 
 	_bg_color_down = ListProperty([])
+	def _get_bg_color_down(self):
+		return self._bg_color_down
+
+	def _set_bg_color_down(self, color, alpha=None):
+		if len(color) == 2:
+			self._bg_color_down = get_rgba_color(color, control_alpha=alpha)
+		elif len(color) == 4:
+			self._bg_color_down = color
+
+	background_color_down = AliasProperty(_get_bg_color_down, _set_bg_color_down,
+										  bind=('_bg_color_down', ))
+
+	_bg_color_disabled = ListProperty([])
+	def _get_bg_color_disabled(self):
+		return self._bg_color_disabled
+
+	def _set_bg_color_disabled(self, color, alpha=None):
+		if len(color) == 2:
+			self._bg_color_disabled = get_rgba_color(color, control_alpha=alpha)
+		elif len(color) == 4:
+			self._bg_color_disabled = color
+	background_color_disabled = AliasProperty(_get_bg_color_disabled, _set_bg_color_disabled,
+											  bind=('_bg_color_disabled', ))
+	_label = ObjectProperty()
 	def _get_bg_color_down(self):
 		return self._bg_color_down
 
@@ -125,37 +156,17 @@ class FlatButton(ThemeBehaviour, RippleBehavior, ButtonBehavior, BoxLayout):
 
 	theme_style = OptionProperty(None, options=['Light', 'Dark', 'Custom'], allownone=True)
 
-	_tmp_color = ListProperty([])
 	_text = StringProperty('')
 	def __init__(self, **kwargs):
 		super(FlatButton, self).__init__(**kwargs)
 		self.text_color = self._theme_cls.primary_text_color()
-		self._tmp_color = self.background_color
-		self._background_color_down = get_rgba_color([self._theme_cls.theme_style, 'FlatButtonDown'],
+		self.bind(text_color=self.setter('text_color_down'))
+		self.background_color_down = get_rgba_color([self._theme_cls.theme_style, 'FlatButtonDown'],
 													 control_alpha=.4)
+		self.background_color_disabled = self._theme_cls.disabled_bg_color()
 
 	def on_text(self, instance, text):
 		self._text = text.upper()
-
-	def on_touch_down(self, touch):
-		if touch.is_mouse_scrolling:
-			return False
-		if not self.collide_point(touch.x, touch.y):
-			return False
-		if self in touch.ud:
-			return False
-		if not self.disabled:
-			self._tmp_color = self.background_color
-			self.background_color = self._background_color_down
-		return super(FlatButton, self).on_touch_down(touch)
-
-	def on_touch_up(self, touch):
-		if not self.disabled:
-			if touch.grab_current is not self:
-				return super(ButtonBehavior, self).on_touch_up(touch)
-			self.background_color = self._tmp_color
-		return super(FlatButton, self).on_touch_up(touch)
-
 
 raised_btn_kv = '''
 <RaisedButton>:
@@ -182,7 +193,7 @@ raised_btn_kv = '''
 		text_color:		root.text_color
 		disabled:		root.disabled
 '''
-
+Builder.load_string(raised_btn_kv)
 
 class RaisedButton(ThemeBehaviour, RippleBehavior, ElevationBehaviour, ButtonBehavior, AnchorLayout):
 
@@ -224,7 +235,6 @@ class RaisedButton(ThemeBehaviour, RippleBehavior, ElevationBehaviour, ButtonBeh
 	_text = StringProperty()
 
 	def __init__(self, **kwargs):
-		Builder.load_string(raised_btn_kv)
 		self.elevation = self.elevation_normal
 
 		if self.elevation_raised == 0 and self.elevation_normal + 6 <= 12:

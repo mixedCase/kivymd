@@ -20,7 +20,7 @@ from ripplebehavior import RippleBehavior
 from theme import ThemeBehaviour
 from material_resources import get_rgba_color
 
-from kivymd.lists import MaterialList
+from kivymd.list import MaterialList
 
 navdrawer_kv = '''
 <NavigationDrawer>:
