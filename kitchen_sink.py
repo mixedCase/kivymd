@@ -18,6 +18,7 @@ from kivymd.avatar import Avatar
 
 from kivymd.list import MaterialList, TextTile
 from kivymd.selectioncontrols import MaterialCheckBox, MaterialSwitch
+from kivymd.textfields import SingleLineTextField
 
 
 kitchen_sink_kv = '''
@@ -27,6 +28,7 @@ RelativeLayout:
 	dialog_btn:		_diag_btn
 	elev_lbl:		_elev_lbl
 	nav: 			_nav
+	textfield:		_textfield
 
 	canvas:
 		Color:
@@ -83,14 +85,14 @@ RelativeLayout:
 		text_color_selected:		app.theme_cls.primary_dark
 		background_color_selected:	(1, 1, 1, 0)
 		size_hint:					0.8, None
-		height:						dp(300)
-		pos_hint:					{'center_x': 0.5, 'center_y': 0.45}
+		height:						dp(250)
+		pos_hint:					{'center_x': 0.5, 'center_y': 0.5}
 
 	MaterialCheckBox:
 		id:							chkbox
 		size_hint:					None, None
 		size:						dp(48), dp(48)
-		pos_hint:					{'center_x': 0.2, 'center_y': 0.15}
+		pos_hint:					{'center_x': 0.2, 'center_y': 0.25}
 	MaterialLabel:
 		text:				"MaterialCheckbox is " + ("active" if chkbox.active else "inactive")
 		font_style:			'Body1'
@@ -100,8 +102,14 @@ RelativeLayout:
 		text_size:			self.size
 		halign:				'center'
 		valign:				'middle'
-		pos_hint:			{'center_x': 0.2, 'center_y': 0.09}
+		pos_hint:			{'center_x': 0.2, 'center_y': 0.19}
 
+	SingleLineTextField:
+		id:					_textfield
+		hint_text:			"A single line TextField"
+		size_hint:			0.8, None
+		height:				dp(48)
+		pos_hint:			{'center_x': 0.5, 'center_y': 0.1}
 
 	# FloatingActionButton:
 	# 	size_hint:			None, None
@@ -254,9 +262,19 @@ class KitchenSink(App):
 
 		self.dialog.add_action_button("Dismiss", action=lambda *x: self.dialog.dismiss())
 
+		root.textfield.bind(on_text_validate=self.set_error_message,
+							on_focus=self.set_error_message)
+
 		root.dialog_btn.bind(on_release=self.dialog.open)
 
 		return root
+
+	def set_error_message(self, *args):
+		if len(self.root.textfield.text) == 0:
+			self.root.textfield.error = True
+			self.root.textfield.error_message = "Some text is required"
+		else:
+			self.root.textfield.error = False
 
 	def on_pause(self):
 		return True
