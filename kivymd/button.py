@@ -59,8 +59,6 @@ class MaterialIconButton(CircularRippleBehavior, ButtonBehavior, MaterialLabel):
 	background_color_disabled = AliasProperty(_get_bg_color_disabled, _set_bg_color_disabled,
 											  bind=('_bg_color_disabled', ))
 
-	theme_style = OptionProperty(None, options=['Light', 'Dark'], allownone=True)
-
 	def __init__(self, **kwargs):
 		super(MaterialIconButton, self).__init__(**kwargs)
 
@@ -281,6 +279,129 @@ class RaisedButton(ThemeBehaviour, RippleBehavior, ElevationBehaviour, ButtonBeh
 
 	def on_text(self, instance, text):
 		self._text = text.upper()
+
+	def on_elevation_normal(self, instance, value):
+		self.elevation = value
+
+	def on_elevation_raised(self, instance, value):
+		if self.elevation_raised == 0 and self.elevation_normal + 6 <= 12:
+			self.elevation_raised = self.elevation_normal + 6
+		elif self.elevation_raised == 0:
+			self.elevation_raised = 12
+
+floating_btn_kv = '''
+<FloatingActionButton>:
+	canvas:
+		Clear
+		Color:
+			rgba: self.background_color_disabled if self.disabled else \
+			(self.background_color if self.state == 'normal' else self.background_color_down)
+		Ellipse:
+			size: self.size
+			pos: self.pos
+
+	anchor_x:			'center'
+	anchor_y:			'center'
+	MaterialLabel:
+		id: label
+		font_style: 	'Icon'
+		icon:			root.icon
+		size_hint:		None, None
+		size:			dp(24), dp(24)
+		text_size:		self.size
+		theme_style:	root.theme_style
+		disabled:		root.disabled
+'''
+Builder.load_string(floating_btn_kv)
+
+class FloatingActionButton(ThemeBehaviour, CircularRippleBehavior, ElevationBehaviour, ButtonBehavior, AnchorLayout):
+
+	_bg_color_down = ListProperty([])
+	def _get_bg_color_down(self):
+		return self._bg_color_down
+
+	def _set_bg_color_down(self, color, alpha=None):
+		if len(color) == 2:
+			self._bg_color_down = get_rgba_color(color, control_alpha=alpha)
+		elif len(color) == 4:
+			self._bg_color_down = color
+
+	background_color_down = AliasProperty(_get_bg_color_down, _set_bg_color_down,
+										  bind=('_bg_color_down', ))
+
+	_bg_color_disabled = ListProperty([])
+	def _get_bg_color_disabled(self):
+		return self._bg_color_disabled
+
+	def _set_bg_color_disabled(self, color, alpha=None):
+		if len(color) == 2:
+			self._bg_color_disabled = get_rgba_color(color, control_alpha=alpha)
+		elif len(color) == 4:
+			self._bg_color_disabled = color
+	background_color_disabled = AliasProperty(_get_bg_color_disabled, _set_bg_color_disabled,
+											  bind=('_bg_color_disabled', ))
+
+	theme_style = OptionProperty(None, options=['Light', 'Dark', 'Custom'], allownone=True)
+
+	icon_color = ListProperty(None, allownone=True)
+
+
+	elevation_normal = BoundedNumericProperty(2, min=0, max=12)
+	elevation_raised = BoundedNumericProperty(0, min=0, max=12)
+
+	icon = StringProperty('md-android')
+
+	def __init__(self, **kwargs):
+		self.elevation = self.elevation_normal
+
+		if self.elevation_raised == 0 and self.elevation_normal + 6 <= 12:
+			self.elevation_raised = self.elevation_normal + 6
+		elif self.elevation_raised == 0:
+			self.elevation_raised = 12
+
+		super(FloatingActionButton, self).__init__(**kwargs)
+		self.background_color = self._theme_cls.primary_color
+		self.background_color_down = self._theme_cls.primary_dark
+		self.background_color_disabled = self._theme_cls.disabled_bg_color()
+
+
+		self.elevation_press_anim = Animation(elevation=self.elevation_raised, duration=.2, t='out_quad')
+		self.elevation_release_anim = Animation(elevation=self.elevation_normal, duration=.2, t='out_quad')
+
+	def _set_ellipse(self, instance, value):
+		ellipse = self.ellipse
+		ripple_rad = self.ripple_rad
+
+		ellipse.size = (ripple_rad, ripple_rad)
+		ellipse.pos = (self.center_x - ripple_rad / 2.,
+					   self.center_y - ripple_rad / 2.)
+
+	def on_disabled(self, instance, value):
+		super(FloatingActionButton, self).on_disabled(instance, value)
+		if self.disabled:
+			self.elevation = 0
+		else:
+			self.elevation = self.elevation_normal
+
+	def on_touch_down(self, touch):
+		if not self.disabled:
+			if touch.is_mouse_scrolling:
+				return False
+			if not self.collide_point(touch.x, touch.y):
+				return False
+			if self in touch.ud:
+				return False
+			self.elevation_press_anim.stop(self)
+			self.elevation_press_anim.start(self)
+		return super(FloatingActionButton, self).on_touch_down(touch)
+
+	def on_touch_up(self, touch):
+		if not self.disabled:
+			if touch.grab_current is not self:
+				return super(ButtonBehavior, self).on_touch_up(touch)
+			self.elevation_release_anim.stop(self)
+			self.elevation_release_anim.start(self)
+		return super(FloatingActionButton, self).on_touch_up(touch)
 
 	def on_elevation_normal(self, instance, value):
 		self.elevation = value
