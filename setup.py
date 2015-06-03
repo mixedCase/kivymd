@@ -11,6 +11,6 @@ setup(name='kivymd',
 	  author_email='andres.rodriguez@lithersoft.com',
 	  url='https://github.com/mixedCase/kivymd',
 	  packages=['kivymd'],
-	  package_data={'kivymd': ['images/*.png', 'images/*.jpg', 'fonts/*.ttf']},
+	  package_data={'kivymd': ['images/*.png', 'images/*.jpg', 'images/*.atlas', 'fonts/*.ttf']},
 	  exclude_package_data={'': ['*.pyc']},
 	  )
