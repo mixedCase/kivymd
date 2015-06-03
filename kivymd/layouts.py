@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.relativelayout import RelativeLayout
@@ -8,8 +7,6 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.widget import Widget
 from kivy.properties import NumericProperty, ReferenceListProperty
 from kivy.graphics import Color, Rectangle
-from kivymd.ripplebehavior import RippleBehavior
-
 
 class BackgroundColorCapableWidget(Widget):
 	r = NumericProperty(1)
@@ -57,12 +54,3 @@ class MaterialRelativeLayout(RelativeLayout, BackgroundColorCapableWidget):
 	def __init__(self, **kwargs):
 		super(MaterialRelativeLayout, self).__init__(**kwargs)
 		self.unbind(pos=self._update_bg_rectangle_pos)
-
-
-class RippleLayout(ButtonBehavior, RippleBehavior, MaterialBoxLayout):
-	"""MaterialBoxLayout with RippleBehavior built in.
-
-	Can be used to give RippleBehavior to any widget with absolute positioning.
-	Specially useful for RelativeLayouts.
-	"""
-	pass

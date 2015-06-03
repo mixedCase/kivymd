@@ -6,7 +6,6 @@ kivy.require('1.9.0')
 
 from kivy.app import App
 from kivy.metrics import dp
-from kivymd.bottom_sheet import BottomSheet, SingleLineItem
 from kivymd.layouts import MaterialRelativeLayout
 from kivymd.toolbar import Toolbar
 from kivymd.navigationdrawer import NavigationDrawer, NavigationDrawerButton, \
@@ -16,7 +15,7 @@ from kivymd.navigationdrawer import NavigationDrawer, NavigationDrawerButton, \
 class MainWidget(MaterialRelativeLayout):
 
 	def __init__(self, **kwargs):
-		self.toolbar = Toolbar(title="KivyMD")
+		self.toolbar = Toolbar(title="KivyMD Kitchen Sink App")
 		self.nav = NavigationDrawer(
 			side="left",
 			header_img=kivymd.images_path + "PLACEHOLDER_BG.jpg",
@@ -25,11 +24,12 @@ class MainWidget(MaterialRelativeLayout):
 
 		self.background_color = (1,1,1,1)
 
-		self.toolbar.nav_button = ["md-menu", lambda: self.nav.toggle()]
-		self.toolbar.add_action_button("md-insert-photo")
-		self.toolbar.add_action_button(
-			"md-security",
-			action=lambda x: self.open_bottom_sheet())
+		self.toolbar.nav_button = ["", lambda: self.nav.toggle()]
+		self.toolbar.add_action_button("")
+		self.toolbar.add_action_button("")
+		self.toolbar.add_action_button("")
+		self.toolbar.add_action_button("")
+
 
 		self.cat1 = NavigationDrawerCategory(subheader=False)
 		self.cat_vendedores = NavigationDrawerCategory(text="Category 1")
@@ -46,18 +46,6 @@ class MainWidget(MaterialRelativeLayout):
 
 		self.add_widget(self.toolbar)
 		self.add_widget(self.nav)
-
-	def open_bottom_sheet(self):
-		self.bottom_sheet = BottomSheet()
-		for i in range(0, 40):
-			self.bottom_sheet.add_item(SingleLineItem(
-				text="Test",
-				divider=False,
-				on_touch_down=lambda x, y: self.close_bottom_sheet()))
-		self.bottom_sheet.open()
-
-	def close_bottom_sheet(self):
-		self.bottom_sheet.dismiss()
 
 	def on_width(self, instance, value):
 		self.toolbar.width = value

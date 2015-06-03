@@ -2,32 +2,39 @@
 from kivy.properties import StringProperty, NumericProperty, BooleanProperty
 from kivy.metrics import dp, sp
 from kivy.uix.image import Image
+from kivy.uix.scrollview import ScrollView
 from kivy.uix.behaviors import ButtonBehavior
 
 from kivymd import material_resources as m_res
-from kivymd.divider import Divider
-from kivymd.layouts import MaterialGridLayout, MaterialRelativeLayout, \
-	MaterialBoxLayout, RippleLayout
-from kivymd.label import MaterialLabel
+from layouts import MaterialGridLayout, MaterialRelativeLayout, \
+	MaterialBoxLayout
+from label import MaterialLabel
+from divider import Divider
 
 
-class List(MaterialGridLayout):
+class List(MaterialRelativeLayout):
 
 	def __init__(self, **kwargs):
 		super(List, self).__init__(**kwargs)
-		self.cols=1
-		self.padding = (0, m_res.LIST_VERTICAL_PADDING,
-		           0, m_res.LIST_VERTICAL_PADDING)
-		self.height = 2 * m_res.LIST_VERTICAL_PADDING
-		self.size_hint_y = None
+		self.sv = ScrollView(do_scroll_x=False)
+		self.gl = MaterialGridLayout(cols=1,
+		                             padding=(0, m_res.LIST_VERTICAL_PADDING,
+		                                      0, m_res.LIST_VERTICAL_PADDING),
+		                             height=2 * m_res.LIST_VERTICAL_PADDING,
+		                             size_hint_y=None)
+		self.sv.add_widget(self.gl)
+		self.add_widget(self.sv)
 
 	def add_widget(self, widget, index=0):
-		self.height += widget.height
-		super(List, self).add_widget(widget, index)
+		if isinstance(widget, _ListItem):
+			self.gl.add_widget(widget)
+			self.gl.height += widget.height
+		else:
+			super(List, self).add_widget(widget, index)
 
 	def clear(self):
-		self.height = 2 * m_res.LIST_VERTICAL_PADDING
-		self.clear_widgets()
+		self.gl.height = 2 * m_res.LIST_VERTICAL_PADDING
+		self.gl.clear_widgets()
 
 
 class _ListItem(ButtonBehavior, MaterialRelativeLayout):
@@ -35,7 +42,6 @@ class _ListItem(ButtonBehavior, MaterialRelativeLayout):
 	text_bottom_padding = NumericProperty(0)
 	text = StringProperty()
 	divider = BooleanProperty(True)
-	ripple_behavior = BooleanProperty(True)
 
 	def __init__(self, **kwargs):
 		self.size_hint_y = None
@@ -56,8 +62,6 @@ class _ListItem(ButtonBehavior, MaterialRelativeLayout):
 		self.add_widget(self.bl_text)
 
 		self.add_widget(self._divider)
-		if self.ripple_behavior:
-			self.add_widget(RippleLayout())
 
 	def on_width(self, instance, value):
 		self.bl_text.width = self.width - self.bl_text.x
@@ -101,14 +105,6 @@ class SingleLineItem(_ListItem):
 		self.height = dp(48)
 
 
-class SubheaderLineItem(SingleLineItem):
-
-	def __init__(self, **kwargs):
-		self.ripple_behavior = False
-		super(SubheaderLineItem, self).__init__(**kwargs)
-		self.lbl_primary.color = (0, 0, 0, 0.54)
-
-
 class SingleLineItemWithIcon(SingleLineItem, _ListItemWithImage):
 	_image_size = (dp(24), dp(24))
 
@@ -117,13 +113,10 @@ class SingleLineItemWithIcon(SingleLineItem, _ListItemWithImage):
 
 
 class SingleLineItemWithAvatar(SingleLineItemWithIcon, _ListItemWithImage):
+	height = dp(56)
 	text_top_padding = dp(20)
 	text_bottom_padding = dp(24)
 	_image_size = (dp(48), dp(48))
-
-	def __init__(self, **kwargs):
-		super(SingleLineItem, self).__init__(**kwargs)
-		self.height = dp(56)
 
 
 class TwoLineItem(_ListItem):

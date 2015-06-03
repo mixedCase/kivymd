@@ -18,7 +18,7 @@ class NavigationDrawer(SlidingPanel):
 
 	header_img = StringProperty()
 
-	def __init__(self, **kwargs):
+	def __init__(self, header_img='', **kwargs):
 		self.scroll_view = ScrollView(do_scroll_x=False,
 		                              size_hint_y=None)
 		self._bl_items = MaterialGridLayout(size_hint_y=None,
@@ -31,6 +31,7 @@ class NavigationDrawer(SlidingPanel):
 		                        mipmap=True)
 		super(NavigationDrawer, self).__init__(**kwargs)
 		self.background_color = (1, 1, 1, 1)
+		self.header_img = header_img
 		self._header_bg.height = self.width * 9 / 16
 		self.header_divider = Divider()
 		self._header_bg.bind(width=self.header_divider.setter('width'),
@@ -139,7 +140,6 @@ class NavigationDrawerCategory(MaterialRelativeLayout):
 		else:
 			self._lbl_name.height = dp(0)
 			self._lbl_name.opacity = 0
-		self._refresh_list()
 
 	def on_divider(self, instance, value):
 		if value:
@@ -175,8 +175,8 @@ class NavigationDrawerButton(MaterialButtonBlank):
 	text = StringProperty()
 
 	def __init__(self, **kwargs):
-		#self.ripple_color = \
-		#	m_res.get_palette_with_alpha(m_res.PALETTE_GREY)["400"]
+		self.ripple_color = \
+			m_res.get_palette_with_alpha(m_res.PALETTE_GREY)["400"]
 		self._lbl = MaterialLabel(x=self.x + dp(72),
 		                          color=(0,0,0,1),
 		                          style="medium")
