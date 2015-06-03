@@ -9,7 +9,6 @@ from kivymd.label import MaterialLabel as Label
 
 
 class DeferredModalView(ModalView):
-
 	def __init__(self, **kwargs):
 		super(DeferredModalView, self).__init__(**kwargs)
 		self.d = None
@@ -29,7 +28,7 @@ class BlankPopup(DeferredModalView):
 	_container = BoxLayout()
 
 	def __init__(self, **kwargs):
-		self.background_color = (0,0,0,0.7)
+		self.background_color = (0, 0, 0, 0.7)
 		super(BlankPopup, self).__init__(**kwargs)
 		self.bl = BoxLayout(orientation="vertical")
 		self.anchor_y = "top"
@@ -48,8 +47,8 @@ class TitledPopup(BlankPopup):
 	def __init__(self, **kwargs):
 		super(TitledPopup, self).__init__(**kwargs)
 		al_title = AnchorLayout(anchor_x="left",
-		                        height=40,
-		                        size_hint=(1, None))
+								height=40,
+								size_hint=(1, None))
 		al_title.add_widget(Label(text=self.title))
 		self.bl.clear_widgets()
 		self.bl.add_widget(al_title)

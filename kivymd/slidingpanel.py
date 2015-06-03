@@ -1,31 +1,30 @@
 # -*- coding: utf-8 -*-
+
 from threading import Timer as ThreadedTimer
-
-from kivy.properties import StringProperty, BooleanProperty, NumericProperty
+from kivy.properties import StringProperty, ListProperty, NumericProperty
 from kivy.animation import Animation
-from kivy.metrics import dp
-
+from kivy.core.window import Window
+from kivy.uix.relativelayout import RelativeLayout
+from kivy.app import App
 from kivymd import helpers
-from layouts import MaterialRelativeLayout
 from kivymd.shadow import Shadow
 
-
-class SlidingPanel(MaterialRelativeLayout):
+class SlidingPanel(RelativeLayout):
 	"""An empty panel that slides from a side"""
 
 	side = StringProperty("left")
 	"""Side from which the menu will slide from
-
 	Valid values are "left" and "right"
 	"""
-
-	has_shadow = BooleanProperty(True)
-	"""Selects wether or not to show shadow behind panel"""
 
 	animation_length = NumericProperty(0.3)
 	"""How long will the animation last"""
 
-	def __init__(self, width=dp(200), **kwargs):
+	def __init__(self, **kwargs):
+		self.register_event_type('on_closed')
+		self.register_event_type('on_opening')
+		self.register_event_type('on_opened')
+		self.register_event_type('on_closing')
 		self.animation_open = Animation(duration=self.animation_length,
 		                                t="out_sine")
 		self.animation_dismiss = Animation(duration=self.animation_length,
@@ -35,7 +34,6 @@ class SlidingPanel(MaterialRelativeLayout):
 		                     on_release=lambda x: self.dismiss())
 		super(SlidingPanel, self).__init__(**kwargs)
 		self.orientation = "vertical"
-		self.width = width
 		self.size_hint = (None, None)
 		self.status = "closed"
 		self.timer = None
@@ -43,6 +41,7 @@ class SlidingPanel(MaterialRelativeLayout):
 		self.shadow.fade_out(0)
 		self.bind(height=self.shadow.setter('height'))
 		helpers.bind_to_rotation(self._device_rotated)
+
 
 	def on_touch_down(self, touch):
 		# Prevents touch events from propagating to anything below the widget.
@@ -54,9 +53,9 @@ class SlidingPanel(MaterialRelativeLayout):
 		if self.status != "closed":
 			return
 		self.update_animations()
-		if self.has_shadow:
-			self.shadow.fade_in(self.animation_length, add_to=self)
+		self.shadow.fade_in(self.animation_length, add_to=self)
 		self.animation_open.start(self)
+		self.dispatch('on_opening')
 		self.status = "opening"
 		self.timer = ThreadedTimer(
 			self.animation_length + 0.1, self._fix_status).start()
@@ -65,9 +64,9 @@ class SlidingPanel(MaterialRelativeLayout):
 		if self.status != "open":
 			return
 		self.update_animations()
-		if self.has_shadow:
-			self.shadow.fade_out(self.animation_length, remove_from=self)
+		self.shadow.fade_out(self.animation_length)
 		self.animation_dismiss.start(self)
+		self.dispatch('on_closing')
 		self.status = "closing"
 		self.timer = ThreadedTimer(
 			self.animation_length + 0.1, self._fix_status).start()
@@ -137,3 +136,15 @@ class SlidingPanel(MaterialRelativeLayout):
 
 	def _set_y(self, instance, value):
 		self.y = value
+
+	def on_closed(self):
+		pass
+
+	def on_opening(self):
+		pass
+
+	def on_opened(self):
+		pass
+
+	def on_closing(self):
+		pass
