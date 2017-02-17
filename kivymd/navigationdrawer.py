@@ -29,7 +29,6 @@ navdrawer_kv = '''
 			rgba: self._theme_cls.dialog_background_color
 		Rectangle:
 			size: self.size
-			pos: self.pos
 
 	_header_bg: 	header_bg
 	_bl_items:		bl_items
