@@ -1,4 +1,4 @@
 Kivy Material Design
 ********************
 
-This repository now lives in: https://gitlab.com/kivymd/KivyMD
+I've handed over maintainership of KivyMD to a new team at: https://github.com/kivymd/KivyMD
